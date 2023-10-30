@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/static/zoro_style.css" ></link>
+        <title>ZORO MAQUETTE</title>
+    </head>
+
+    <body>
+        <section class="second">
+            {% include './base_html/header.html' %}
+
+            <div class="new_grey">
+                {% include './base_html/side_bar.html' %}
+
+                {% block centre %}
+                {% endblock %}
+
+            </div>
+
+        </section>
+    </body>
+</html>
+

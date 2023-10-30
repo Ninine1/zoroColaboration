@@ -1,0 +1,330 @@
+header{
+    width: 100%;
+    height: 10%;
+    background-color: rgb(83, 182, 218);
+    border: solid blue;
+    font-size: 2rem;
+    text-align: center;
+    color: white;
+    margin-top: 50px;
+}
+
+.first{
+    height: 600px;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.grey{
+    width: 100%;
+    height: 80%;
+    background-color: rgb(174, 171, 171);
+    border: solid blue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.sign_in{
+    width: 25%;
+    height: 45%;
+    border-radius: 10px;
+    border: solid blue;
+    background-color: rgb(83, 182, 218);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sign_in .btn1, .sign_in .btn2{
+    width: 80%;
+    height: 10%;
+    background-color: white;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.btna{
+    width: 40%;
+    height: 12%;
+    background-color: grey;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border: solid black 1px; 
+}
+
+.btn3{
+    width: 100%;
+    height: 100%;
+    color: white;
+    cursor: pointer; 
+    border-radius: 5px;
+}
+
+.second{
+    width: 100%;
+    height: 600px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.new_grey{
+    width: 100%;
+    height: 80%;
+    display: flex;
+
+}
+
+.left{
+    width: 20%;
+    height: 100%;
+    background-color: rgb(83, 182, 218);
+    border: solid blue 1px;
+}
+
+.left div{
+    width: 100%;
+    height: 5%;
+    background-color: white;
+    border: solid black 1px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+    align-items: center;
+
+}
+
+.left div:hover{
+    background-color: grey;
+}
+
+.left div a{
+    text-decoration: none; 
+    border: none; 
+    outline: none;
+}
+
+.right{
+    width: 80%;
+    height: 100%;
+    background-color: rgb(174, 171, 171);
+    border: solid blue 1px;
+    text-align: left;
+}
+
+.three{
+    margin-top: 50px;
+    height: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 50px;
+}
+
+.droite{
+    width: 80%;
+    height: 100%;
+    background-color: rgb(174, 171, 171);
+    border: solid blue 1px;
+    position: relative;
+}
+
+.btn6{
+    position: absolute;
+    right: 30px;
+    top: 15px;
+    background-color: none;
+}
+
+.btn6 button{
+    border: solid blue 1px;
+    height: 30px;
+    width: 70px;
+    background-color: green;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.tableau{
+    width: 80%;
+    height: 60%;
+    margin: 20px;
+    margin-left: 60px;
+    align-items: center;
+}
+
+.tableau table{
+    width: 100%;
+    height: 100%;
+    border: solid white 1px;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+.tableau table td, tr, th{
+    border: solid white;
+}
+
+.tableau table td{
+    background-color: rgb(196, 218, 248);
+}
+
+.tableau table tr{
+    background-color: blue;
+}
+
+.impair{
+    background-color: rgb(171, 194, 220) !important;
+}
+
+.mod_btn{
+    color: white;
+    background-color: rgb(218, 167, 72);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+  
+}
+
+.supp_btn{
+    color: white;
+    background-color: red;
+    margin-left: 5px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.four{
+    margin-top: 50px;
+    height: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* .left div :nth-child(1) */
+
+.four .right{
+  align-items: center;
+}
+
+.four .right p{
+    left: 0 !important; 
+    margin-top: 20px;
+
+
+}
+form{
+    display: grid;
+    grid-template-columns: 15% 60%;
+    grid-template-rows: repeat(4,25%);
+    row-gap: 10px;
+    margin-top: 50px;
+    margin-left: 50px;
+
+}
+form div{
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+ .btn{
+    width:  100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ }
+
+ .btn4{
+    border: solid blue 1px;
+    background-color: red;
+    border-radius: 5px;
+    text-align: center;
+    padding: 5px;
+    width: 20%;
+ }
+
+ .btn5{
+    border: solid blue 1px;
+    background-color: green;
+    border-radius: 5px;
+    text-align: center;   
+    padding: 5px;
+    width: 20%;
+    margin-right: 10px; 
+    cursor: pointer;
+
+ } 
+
+.five{
+    width: 100%;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+
+.haut{
+    width: 100%;
+    height: 25%;
+    display: flex;
+    align-items: center;
+}
+
+.txt{
+    width: 25%;
+    height: 30px;
+    position: absolute;
+    left: 30px;
+    top: 15px;
+    background-color: none;
+}
+
+.txt p{
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    border: solid blue 1px;
+    background-color: rgb(166, 199, 166);
+    font-size: small;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 30px;
+
+}
+
+.new{
+    color: rgb(78, 197, 78) !important;
+}
+
+.msg_supp{
+    border: solid blue 1px;
+    border-radius: 5px;
+    background-color: rgb(247, 197, 206);
+    text-align: center;
+    width: 50%;
+    align-items: center;
+}
+
+
+
+
+
+
