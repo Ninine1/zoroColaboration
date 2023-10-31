@@ -3,19 +3,6 @@ import pyodbc
 
 app = Flask(__name__)
 
-conn = pyodbc.connect('DRIVER={SQL Server};SERVER=Lynn\SQLEXPRESS;DATABASE=Test;')
-print('connected')
-
-'''@app.route('/mesdonnees')
-def mes_donnees():
-    connection = connect_to_sql_server()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM MaTable WHERE email=%s and password=%s", (email, password))
-    data = cursor.fetchall()
-    connection.close()
-    return render_template('mesdonnees.html', data=data)'''
-
-
 @app.route("/")
 def login():
     return render_template("zoro.html")
