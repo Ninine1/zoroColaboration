@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block centre %}
+<div class="right">
+         {% block p %}
+    <strong><p>Ajouter un produit</p></strong>
+        {% endblock %}
+
+    <div class="form">
+        <form action="/prod_msg_success/">
+            <label for="id"> Id: </label>
+            <input type="text" id="name" name="fname">
+
+            <label for="name"> Nom: </label>
+            <input type="text" id="name" name="fname">
+
+            <label for="cat"> Catégorie: </label>
+            <input type="text" id="name" name="fname">
+
+            <label for="prix"> Prix: </label>
+            <input type="text" id="name" name="fname">
+
+            <div class="btn" style="text-decoration: none; border: none;">
+                <button type="submit" class="btn5">Valider</button>
+                <button class="btn4"><a href="/produits/" target="_blank">Retour</a></button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
