@@ -7,11 +7,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:''@localhost/colab
 app.config['SECRET_KEY'] = 'secret key'
 
 db = SQLAlchemy(app)
-# mysql = MySQL(app)
-# mysql.init_app(app)
 
 
-# db.init_app(app)
 with app.app_context():
     db.create_all()
 
@@ -25,6 +22,7 @@ class Data(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.id
+
 
 
 @app.route("/")
@@ -66,6 +64,9 @@ def success():
     magasins = Data.query.order_by(Data.id).all()
     return render_template("success.html", magasins=magasins)
 
+@app.route("/modifier_mag/")
+def modifier_mag():
+    return render_template("modifier_mag.html")
 
 @app.route("/modifier_mag/<int:_id>", methods=["POST", "GET"])
 def modifier_mag(_id):
@@ -105,6 +106,7 @@ def supp_mag(_id):
     return render_template("/supp_mag.html", magasins=magasins)
 
 
+
 @app.route("/success_supp/")
 def success_sup():
     magasins = Data.query.order_by(Data.id).all()
@@ -122,6 +124,46 @@ def success_edit():
 @app.route("/MSG_success1/")
 def MSG_success1():
     return render_template("MSG_success1.html")
+
+
+@app.route("/produits/")
+def produits():
+    return render_template("produits.html")
+
+
+@app.route("/add_prod/")
+def add_prod():
+    return render_template("add_prod.html")
+
+
+@app.route("/edit_prod/")
+def edit_prod():
+    return render_template("edit_prod.html")
+
+
+@app.route("/supp_prod/")
+def supp_prod():
+    return render_template("supp_prod.html")
+
+
+@app.route("/prod_msg_success/")
+def prod_msg_success():
+    return render_template("prod_msg_success.html")
+
+
+@app.route("/prod_success/")
+def prod_success():
+    return render_template("prod_success.html")
+
+
+@app.route("/prod_success_edit/")
+def prod_success_edit():
+    return render_template("prod_success_edit.html")
+
+
+@app.route("/prod_success_supp/")
+def prod_success_supp():
+    return render_template("prod_success_supp.html")
 
 
 # c'est pour éviter d'avoir à écrire dans le terminal à chaque fois
