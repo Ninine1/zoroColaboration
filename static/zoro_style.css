@@ -156,7 +156,7 @@ header{
 
 .tableau{
     width: 80%;
-    height: 60%;
+    /* height: 60%; */
     margin: 20px;
     margin-left: 60px;
     align-items: center;
@@ -174,12 +174,17 @@ header{
     border: solid white;
 }
 
+.tableau table th{
+    color: white;
+}
+
 .tableau table td{
     background-color: rgb(196, 218, 248);
 }
 
 .tableau table tr{
     background-color: blue;
+    height: 40px;
 }
 
 .impair{

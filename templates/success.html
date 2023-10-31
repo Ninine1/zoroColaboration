@@ -23,13 +23,45 @@
                 <th>Mail</th>
                 <th>Action</th>
             </tr>
+
+            {% for data in magasins %}
+
+            <tr>
+                <td class="impair">{{data.id}}</td>
+                <td class="impair">{{data.name}}</td>
+                <td class="impair">{{data.adresse}}</td>
+                <td class="impair">{{data.telephone}}</td>
+                <td class="impair">{{data.mail}}</td>
+                <td class="impair">
+                    <a href="/modifier_mag/{{data.id}}" class="mod_btn"
+                        style="text-decoration: none; border: none;">Modifier</a>
+                    <a href="/supp_mag/{{data.id}}" class="supp_btn"
+                        style="text-decoration: none; border: none;">Suprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
+
+<!-- <tr>
+                <th>id</th>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Téléphone</th>
+                <th>Mail</th>
+                <th>Action</th>
+            </tr>
             <tr>
                 <td class="impair">1</td>
                 <td class="impair">Magasin 1</td>
                 <td class="impair">Adresse 1</td>
                 <td class="impair">Téléphone 1</td>
                 <td class="impair">Mail 1</td>
-                 <td class="impair">
+                <td class="impair">
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -40,7 +72,7 @@
                 <td>Adresse 2</td>
                 <td>Téléphone 2</td>
                 <td>Mail 2</td>
-                 <td>
+                <td>
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -51,7 +83,7 @@
                 <td class="impair">Adresse 3</td>
                 <td class="impair">Téléphone 3</td>
                 <td class="impair">Mail 3</td>
-                 <td class="impair">
+                <td class="impair">
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -62,7 +94,7 @@
                 <td>Adresse 4</td>
                 <td>Téléphone 4</td>
                 <td>Mail 4</td>
-                 <td>
+                <td>
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -73,7 +105,7 @@
                 <td class="impair">Adresse 5</td>
                 <td class="impair">Téléphone 5</td>
                 <td class="impair">Mail 5</td>
-                 <td class="impair">
+                <td class="impair">
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -84,7 +116,7 @@
                 <td>Adresse 6</td>
                 <td>Téléphone 6</td>
                 <td>Mail 6</td>
-                 <td>
+                <td>
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -95,7 +127,7 @@
                 <td class="impair">Adresse 7</td>
                 <td class="impair">Téléphone 7</td>
                 <td class="impair">Mail 7</td>
-                 <td class="impair">
+                <td class="impair">
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
@@ -106,14 +138,8 @@
                 <td class="new">Nouveau</td>
                 <td class="new">Nouveau</td>
                 <td class="new">Nouveau</td>
-                 <td class="impair">
+                <td class="impair">
                     <a href="/modifier_mag/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
                     <a href="/supp_mag/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
-            </tr>
-        </table>
-    </div>
-
-</div>
-
-{% endblock %}
+            </tr> -->
