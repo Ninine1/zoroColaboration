@@ -4,5 +4,18 @@
      <div><a href="/produits/" class="btn1">Produit</a></div>
      <div>Vente</div>
      <div>Stock</div>
-     <div><a href="/" class="btn1">Déconnexion</a></div>
+
+     <form action="{{ url_for('logout') }}" method="post">
+
+          <div class="div-dec">
+               <button type="submit" class="dec">Déconnexion</button>
+          </div>
+
+
+     </form>
+
+
+
+     <!-- <div><a href=" {{url_for('logout')}}" class="btn1">Déconnexion</a>
+     </div> -->
 </div>
