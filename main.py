@@ -1,26 +1,31 @@
+from collections.abc import Mapping, Sequence
 import hashlib
-from flask_bcrypt import Bcrypt
+from typing import Any
+# from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import form, FlaskForm
-from werkzeug.security import check_password_hash
+from flask_wtf import FlaskForm
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import pymysql
-from werkzeug.security import generate_password_hash
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+
 # DATABASE_URL = 'mysql://root:''@localhost/colab_zoro'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:''@localhost/colab_zoro'
 app.config['SECRET_KEY'] = 'secret key'
 
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 
 with app.app_context():
     db.create_all()
@@ -33,10 +38,16 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = bcrypt.generate_password_hash(
+            password)  # generate_password_hash(password)
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def verify_password(self, password):
+        return bcrypt.check_password_hash(self.password_hash, password)
+
+    # * Create a String
+    def __repr__(self):
+        return '<Name %r>' % self.username
+
 
 # def reset_passwords():
 #     users = User.query.all()
@@ -89,6 +100,7 @@ def register():
     if request.method == 'POST' and form.validate_on_submit():
         username = form.username.data
         password = form.password.data
+        # hashed_password = bcrypt.generate_password_hash(password)
 
         # generate_password_hash(
         # password, method='pbkdf2:sha256')
@@ -126,7 +138,9 @@ def login():
 
         user = User.query.filter_by(username=username).first()
         print(f"User found: {user}")
-        if user and user.check_password(password):
+        if user and user.verify_password(password):
+            # bcrypt.check_password(user.password, password)
+            # user.check_password(password)
             login_user(user)
             flash('Login successful!', 'success')
             print(f"username: {username} and password: {password}")

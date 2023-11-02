@@ -9,6 +9,10 @@ header{
     margin-top: 50px;
 }
 
+li{
+    list-style: none;
+}
+
 .first{
     height: 600px;
     width: 100%;
