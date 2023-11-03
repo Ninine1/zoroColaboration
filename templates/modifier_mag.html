@@ -8,7 +8,11 @@
   {% endblock %}
 
   <div class="form">
-    <form action="/modifier_mag/{{magasin.id}}" method="post">
+<<<<<<< Updated upstream
+    <form action="/magasin/modifier_mag/{{magasin.id}}" method="post">
+=======
+    <form action="/magasin/modifier_mag/{{magasin.id_magasin}}" method="post">
+>>>>>>> Stashed changes
       <label for="name"> Nom: </label>
       <input type="text" id="name" name="name" , value="{{magasin.name}}">
 
