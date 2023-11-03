@@ -54,10 +54,15 @@ class User(db.Model, UserMixin):
 
 
 # ? Création du modèle SQLAlchemy pour les Magasins
+<<<<<<< Updated upstream
 
 
 class Magasin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+=======
+class Magasin(db.Model):
+    id_magasin = db.Column(db.Integer, primary_key=True)
+>>>>>>> Stashed changes
     name = db.Column(db.String(50), nullable=False)
     adresse = db.Column(db.String(50), nullable=False)
     telephone = db.Column(db.String(20), nullable=False)
@@ -65,6 +70,8 @@ class Magasin(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.id
+
+# ? Création du modèle SQLAlchemy pour les Magasins
 
 
 class LoginForm(FlaskForm):
@@ -168,7 +175,11 @@ def choix():
 @app.route("/magasin/")
 @login_required
 def magasin():
+<<<<<<< Updated upstream
     magasins = Magasin.query.order_by(Magasin.id).all()
+=======
+    magasins = Magasin.query.order_by(Magasin.id_magasin).all()
+>>>>>>> Stashed changes
     return render_template("magasin.html", magasins=magasins)
 
 
@@ -190,9 +201,15 @@ def new_magasin():
         flash(f"Le {name} a été ajouter avec succès")
         return redirect('/magasin')
 
+<<<<<<< Updated upstream
     return render_template("success.html", magasins=magasins)
 
 
+=======
+    return render_template("magasin.html")
+
+
+>>>>>>> Stashed changes
 @app.route("/magasin/modifier_mag/<int:_id>", methods=["POST", "GET"])
 @login_required
 def modifier_mag(_id):
@@ -201,7 +218,11 @@ def modifier_mag(_id):
         adresse = request.form["adresse"]
         telephone = request.form["telephone"]
         mail = request.form["mail"]
+<<<<<<< Updated upstream
         magasin = Magasin.query.filter_by(id=_id).first()
+=======
+        magasin = Magasin.query.filter_by(id_magasin=_id).first()
+>>>>>>> Stashed changes
         magasin.name = name
         magasin.adresse = adresse
         magasin.telephone = telephone
@@ -211,16 +232,26 @@ def modifier_mag(_id):
         flash(f"Votre magasin {_id} a été modifié avec succès")
         return redirect("/magasin")
 
+<<<<<<< Updated upstream
     magasin = Magasin.query.filter_by(id=_id).first()
+=======
+    magasin = Magasin.query.filter_by(id_magasin=_id).first()
+>>>>>>> Stashed changes
     return render_template("modifier_mag.html", magasin=magasin)
 
 
 @app.route("/magasin/supp_mag/<int:_id>")
 @login_required
 def supp_mag(_id):
+<<<<<<< Updated upstream
     magasin = Magasin.query.filter_by(id=_id).first()
     flash(f"Vous êtes sur le point de supprimer le magasin n°{
         magasin.id}. Etes-vous sûr de vouloir continuer ?")
+=======
+    magasin = Magasin.query.filter_by(id_magasin=_id).first()
+    flash(f"Vous êtes sur le point de supprimer le magasin n°{
+        magasin.id_magasin}. Etes-vous sûr de vouloir continuer ?")
+>>>>>>> Stashed changes
     return render_template("/supp_mag.html", id_mag=magasin)
 
 
@@ -230,7 +261,11 @@ def supp_def(_id):
     magasin = Magasin.query.filter_by(id=_id).first()
     db.session.delete(magasin)
     db.session.commit()
+<<<<<<< Updated upstream
     flash(f"Votre magasin {_id} a été supprimé avec succès")
+=======
+    flash(f"Le magasin n°{_id} a été supprimé avec succès")
+>>>>>>> Stashed changes
     return redirect("/magasin")
 
 
