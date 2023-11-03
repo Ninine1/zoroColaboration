@@ -3,24 +3,12 @@
 
 <div class="right">
     <div class="msg_supp">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class="flash-messages">
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
+        <p>Vous êtes sur le point de supprimer le magasin n°{{id_mag.id}}. Etes-vous <br>
+            sûr de vouloir continuer?</p>
     </div>
 
     <div class="btn" style="text-decoration: none; border: none;">
-<<<<<<< Updated upstream
         <button class="btn5"><a href="/supp_def/{{id_mag.id}}" target="blank">Confirmer</a></button>
-=======
-        <button class="btn5"><a href="/supp_def/{{id_mag.id_magasin}}" target="blank">Confirmer</a></button>
->>>>>>> Stashed changes
         <button class="btn4"><a href="/magasin/" target="_blank">Retour</a></button>
     </div>
 

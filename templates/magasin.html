@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {% extends "base.html" %}
 {% block centre %}
 
@@ -54,61 +53,4 @@
     </div>
 
 </div>
-=======
-{% extends "base.html" %}
-{% block centre %}
-
-<div class="droite">
-
-    <a href="{{url_for('new_magasin')}}" class="btn6" style="text-decoration: none; border: none;">
-        <button>Ajouter</button>
-    </a>
-
-    <p><strong>Liste des magasins <br></strong></p>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-
-    <div class="tableau">
-        <table>
-            <tr>
-                <th>id</th>
-                <th>Nom</th>
-                <th>Adresse</th>
-                <th>Téléphone</th>
-                <th>Mail</th>
-                <th>Action</th>
-            </tr>
-
-            {% for data in magasins %}
-            <tr>
-                <td class="impair">{{data.id}}</td>
-                <td class="impair">{{data.name}}</td>
-                <td class="impair">{{data.adresse}}</td>
-                <td class="impair">{{data.telephone}}</td>
-                <td class="impair">{{data.mail}}</td>
-                <td class="impair">
-                    <a href="/magasin/modifier_mag/{{data.id}}" class="mod_btn"
-                        style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/magasin/supp_mag/{{data.id}}" class="supp_btn"
-                        style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            {% endfor %}
-
-
-
-        </table>
-
-
-    </div>
-
-</div>
->>>>>>> priscille
 {% endblock %}

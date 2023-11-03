@@ -1,18 +1,23 @@
+from collections.abc import Mapping, Sequence
+import hashlib
+from typing import Any
+# from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from werkzeug.security import generate_password_hash, check_password_hash
+
+import pymysql
 from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 from flask_bcrypt import Bcrypt
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://HP\\goliy:''@HP\\SQLEXPRESS/colab_zoro?driver=ODBC+Driver+17+for+SQL+Server'
-
 app = Flask(__name__)
 
+# DATABASE_URL = 'mysql://root:''@localhost/colab_zoro'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:''@localhost/colab_zoro'
 app.config['SECRET_KEY'] = 'secret key'
-
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -20,6 +25,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# bcrypt = Bcrypt(app)
 
 with app.app_context():
     db.create_all()
@@ -54,15 +60,10 @@ class User(db.Model, UserMixin):
 
 
 # ? Création du modèle SQLAlchemy pour les Magasins
-<<<<<<< Updated upstream
 
 
-class Magasin(db.Model):
+class Data(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-=======
-class Magasin(db.Model):
-    id_magasin = db.Column(db.Integer, primary_key=True)
->>>>>>> Stashed changes
     name = db.Column(db.String(50), nullable=False)
     adresse = db.Column(db.String(50), nullable=False)
     telephone = db.Column(db.String(20), nullable=False)
@@ -70,8 +71,6 @@ class Magasin(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.id
-
-# ? Création du modèle SQLAlchemy pour les Magasins
 
 
 class LoginForm(FlaskForm):
@@ -120,11 +119,7 @@ def register():
         try:
             db.session.commit()
             login_user(new_user)
-<<<<<<< HEAD
             flash('Registration successful. You are now log in.', 'success')
-=======
-            flash('Registration successful.', 'success')
->>>>>>> priscille
             return redirect(url_for('choix'))
         except Exception as e:
             flash('An error occurred during registration. Please try again.', 'danger')
@@ -168,25 +163,18 @@ def logout():
 @app.route("/choix/")
 @login_required
 def choix():
-<<<<<<< HEAD
     return render_template("choix.html")  # redirect(url_for("login"))
-=======
-    return render_template("choix.html")
->>>>>>> priscille
 
 
 @app.route("/magasin/")
 @login_required
 def magasin():
-<<<<<<< Updated upstream
-    magasins = Magasin.query.order_by(Magasin.id).all()
-=======
-    magasins = Magasin.query.order_by(Magasin.id_magasin).all()
->>>>>>> Stashed changes
+    # magasin = Data.query.filter_by(id=_id).first()
+    magasins = Data.query.order_by(Data.id).all()
     return render_template("magasin.html", magasins=magasins)
 
 
-@app.route("/magasin/new_magasin/", methods=['GET', 'POST'])
+@app.route("/new_magasin/", methods=['GET', 'POST'])
 @login_required
 def new_magasin():
     if request.method == 'GET':
@@ -197,28 +185,22 @@ def new_magasin():
         adresse = request.form.get('adresse')
         telephone = request.form.get('telephone')
         mail = request.form.get('mail')
-        magasin = Magasin(name=name, adresse=adresse,
-                          telephone=telephone, mail=mail)
+        magasin = Data(name=name, adresse=adresse,
+                       telephone=telephone, mail=mail)
         db.session.add(magasin)
         db.session.commit()
-<<<<<<< HEAD
         flash(f"Le {name} a été ajouté avec succès", 'success')
         # 20f7546f191061ec2c61ee97fa27d5cdb17d55be
-=======
-        flash(f"Le {name} a été ajouter avec succès")
->>>>>>> priscille
         return redirect('/magasin')
 
-<<<<<<< Updated upstream
+
+@app.route("/success/")
+def success():
+    magasins = Data.query.order_by(Data.id).all()
     return render_template("success.html", magasins=magasins)
 
 
-=======
-    return render_template("magasin.html")
-
-
->>>>>>> Stashed changes
-@app.route("/magasin/modifier_mag/<int:_id>", methods=["POST", "GET"])
+@app.route("/modifier_mag/<int:_id>", methods=["POST", "GET"])
 @login_required
 def modifier_mag(_id):
     if request.method == 'POST':
@@ -226,18 +208,13 @@ def modifier_mag(_id):
         adresse = request.form["adresse"]
         telephone = request.form["telephone"]
         mail = request.form["mail"]
-<<<<<<< Updated upstream
-        magasin = Magasin.query.filter_by(id=_id).first()
-=======
-        magasin = Magasin.query.filter_by(id_magasin=_id).first()
->>>>>>> Stashed changes
+        magasin = Data.query.filter_by(id=_id).first()
         magasin.name = name
         magasin.adresse = adresse
         magasin.telephone = telephone
         magasin.mail = mail
         db.session.add(magasin)
         db.session.commit()
-<<<<<<< HEAD
 
         flash(f"Votre magasin {_id} a été modifié avec succès.")
         return redirect("/magasin")
@@ -258,46 +235,25 @@ def supp_def(_id):
 
 
 @app.route("/supp_mag/<int:_id>")
-=======
-        flash(f"Votre magasin {_id} a été modifié avec succès")
-        return redirect("/magasin")
-
-<<<<<<< Updated upstream
-    magasin = Magasin.query.filter_by(id=_id).first()
-=======
-    magasin = Magasin.query.filter_by(id_magasin=_id).first()
->>>>>>> Stashed changes
-    return render_template("modifier_mag.html", magasin=magasin)
-
-
-@app.route("/magasin/supp_mag/<int:_id>")
-@login_required
->>>>>>> priscille
 def supp_mag(_id):
-<<<<<<< Updated upstream
-    magasin = Magasin.query.filter_by(id=_id).first()
-    flash(f"Vous êtes sur le point de supprimer le magasin n°{
-        magasin.id}. Etes-vous sûr de vouloir continuer ?")
-=======
-    magasin = Magasin.query.filter_by(id_magasin=_id).first()
-    flash(f"Vous êtes sur le point de supprimer le magasin n°{
-        magasin.id_magasin}. Etes-vous sûr de vouloir continuer ?")
->>>>>>> Stashed changes
+    magasin = Data.query.filter_by(id=_id).first()
+    # db.session.delete(magasin)
+    # db.session.commit()
     return render_template("/supp_mag.html", id_mag=magasin)
 
 
-@app.route("/supp_def/<int:_id>")
-@login_required
-def supp_def(_id):
-    magasin = Magasin.query.filter_by(id=_id).first()
-    db.session.delete(magasin)
-    db.session.commit()
-<<<<<<< Updated upstream
-    flash(f"Votre magasin {_id} a été supprimé avec succès")
-=======
-    flash(f"Le magasin n°{_id} a été supprimé avec succès")
->>>>>>> Stashed changes
-    return redirect("/magasin")
+@app.route("/success_supp/")
+def success_sup():
+    magasins = Data.query.order_by(Data.id).all()
+    # mag_id = Data.query.filter_by(id=_id).first()
+    # flash_id = flash("{}".format(mag_id.id))
+    return render_template("success_supp.html", magasins=magasins)
+
+
+@app.route("/success_edit/")
+def success_edit():
+    magasins = Data.query.order_by(Data.id).all()
+    return render_template("success_edit.html", magasins=magasins)
 
 
 @app.route("/MSG_success1/")
@@ -348,26 +304,3 @@ def prod_success_supp():
 # c'est pour éviter d'avoir à écrire dans le terminal à chaque fois
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=50000, debug=True)
-
-
-# @app.route("/success/")
-# @login_required
-# def success():
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#
-
-# @app.route("/success_supp/")
-# @login_required
-# def success_sup():
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#     mag_id = Magasin.query.filter_by(id=_id).first()
-#     flash_id = flash("{}".format(mag_id.id))
-#     return render_template("success_supp.html", magasins=magasins)
-
-
-# @app.route("/success_edit/")
-# @login_required
-# def success_edit():
-#     magasin = Magasin.query.filter_by(id=_id).first()
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#     return render_template("success_edit.html", magasins=magasins)

@@ -2,19 +2,7 @@
 
 {% block txtp %}
 <div class="txt">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-
-
-
-    <!-- <p>Votre magasin{{flash_id}} a été supprimé avec succès</p> -->
+    <p>Votre magasin{{flash_id}} a été supprimé avec succès</p>
 
 </div>
 {% endblock %}
