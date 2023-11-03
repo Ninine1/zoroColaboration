@@ -1,6 +1,15 @@
 {% extends "success.html" %}
 {% block txtp %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flash-messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
 
-<p>Votre magasin X a été modifié avec succès</p>
+<!-- <p>Votre magasin {{magasins}} a été modifié avec succès</p> -->
 
 {% endblock %}
