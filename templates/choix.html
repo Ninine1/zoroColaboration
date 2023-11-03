@@ -1,3 +1,18 @@
+<<<<<<< HEAD
+{% extends "base.html" %}
+{% block centre %}
+<div class="right">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li id="flash-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</div>
+=======
 {% extends "base.html" %}
 {% block centre %}
 <div class="right">
@@ -12,4 +27,5 @@
     {% endwith %}
 
 </div>
+>>>>>>> priscille
 {% endblock %}

@@ -120,7 +120,11 @@ def register():
         try:
             db.session.commit()
             login_user(new_user)
+<<<<<<< HEAD
+            flash('Registration successful. You are now log in.', 'success')
+=======
             flash('Registration successful.', 'success')
+>>>>>>> priscille
             return redirect(url_for('choix'))
         except Exception as e:
             flash('An error occurred during registration. Please try again.', 'danger')
@@ -140,18 +144,13 @@ def login():
         user = User.query.filter_by(username=username).first()
         print(f"User found: {user}")
         if user and user.verify_password(password):
-            # bcrypt.check_password(user.password, password)
-            # user.check_password(password)
             login_user(user)
-            flash('Login successful!', 'success')
-            print(f"username: {username} and password: {password}")
+            flash('You are now log in.', 'success')
             return redirect(url_for('choix'))
-            # redirect(url_for('choix'))
         else:
             flash(f'Login failed. Check your username: {
                 username} and password: {password}.', 'danger')
-            print("Login failed. Check your username and password.")
-            # return "Login failed. Check your username and password."
+
     return render_template('zoro.html', form=form)
 
 
@@ -169,7 +168,11 @@ def logout():
 @app.route("/choix/")
 @login_required
 def choix():
+<<<<<<< HEAD
+    return render_template("choix.html")  # redirect(url_for("login"))
+=======
     return render_template("choix.html")
+>>>>>>> priscille
 
 
 @app.route("/magasin/")
@@ -198,7 +201,12 @@ def new_magasin():
                           telephone=telephone, mail=mail)
         db.session.add(magasin)
         db.session.commit()
+<<<<<<< HEAD
+        flash(f"Le {name} a été ajouté avec succès", 'success')
+        # 20f7546f191061ec2c61ee97fa27d5cdb17d55be
+=======
         flash(f"Le {name} a été ajouter avec succès")
+>>>>>>> priscille
         return redirect('/magasin')
 
 <<<<<<< Updated upstream
@@ -229,6 +237,28 @@ def modifier_mag(_id):
         magasin.mail = mail
         db.session.add(magasin)
         db.session.commit()
+<<<<<<< HEAD
+
+        flash(f"Votre magasin {_id} a été modifié avec succès.")
+        return redirect("/magasin")
+
+    magasin = Data.query.filter_by(id=_id).first()
+    return render_template("modifier_mag.html", magasin=magasin)
+
+
+@app.route("/supp_def/<int:_id>")
+def supp_def(_id):
+    # magasins = Data.query.order_by(Data.id).all()
+    magasin = Data.query.filter_by(id=_id).first()
+    db.session.delete(magasin)
+    db.session.commit()
+
+    flash(f"Le magasin{_id} a été supprimé avec succès.")
+    return redirect("/magasin")
+
+
+@app.route("/supp_mag/<int:_id>")
+=======
         flash(f"Votre magasin {_id} a été modifié avec succès")
         return redirect("/magasin")
 
@@ -242,6 +272,7 @@ def modifier_mag(_id):
 
 @app.route("/magasin/supp_mag/<int:_id>")
 @login_required
+>>>>>>> priscille
 def supp_mag(_id):
 <<<<<<< Updated upstream
     magasin = Magasin.query.filter_by(id=_id).first()
