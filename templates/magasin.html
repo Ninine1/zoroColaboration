@@ -8,6 +8,15 @@
     </a>
 
     <p><strong>Liste des magasins <br></strong></p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li id="flash-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 
     <div class="tableau">
         <table>
