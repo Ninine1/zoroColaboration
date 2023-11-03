@@ -190,6 +190,7 @@ def new_magasin():
         db.session.add(magasin)
         db.session.commit()
         flash(f"Le {name} a été ajouté avec succès", 'success')
+        # 20f7546f191061ec2c61ee97fa27d5cdb17d55be
         return redirect('/magasin')
 
 
