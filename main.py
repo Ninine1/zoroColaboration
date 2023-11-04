@@ -13,6 +13,11 @@ from wtforms import PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 from flask_bcrypt import Bcrypt
 
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+
+from sqlalchemy import inspect
+
 app = Flask(__name__)
 
 # DATABASE_URL = 'mysql://root:''@localhost/colab_zoro'
@@ -62,8 +67,8 @@ class User(db.Model, UserMixin):
 # ? Création du modèle SQLAlchemy pour les Magasins
 
 
-class Data(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+class Magasin(db.Model):
+    id_magasin = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     adresse = db.Column(db.String(50), nullable=False)
     telephone = db.Column(db.String(20), nullable=False)
@@ -73,6 +78,69 @@ class Data(db.Model):
         return '<Name %r>' % self.id
 
 
+# ? Création du modèle SQLAlchemy pour les Produits
+class Produit(db.Model):
+    # Colonne d'identifiant unique
+    id_produit = db.Column(db.Integer, primary_key=True)
+
+    # Colonne pour le nom du produit
+    name = db.Column(db.String(100), nullable=False)
+
+    # Colonne pour la catégorie du produit
+    categorie = db.Column(db.String(100), nullable=False)
+
+    # Colonne pour le prix du produit
+    prix = db.Column(db.Float, nullable=False)
+
+    # Méthode spéciale pour représenter l'objet sous forme de chaîne
+    def __repr__(self):
+        return f'<Produit {self.name}>'
+
+
+# ? Création du modèle SQLAlchemy pour les Ventes
+class Vente(db.Model):
+    # Colonne d'identifiant unique
+    id_vente = db.Column(db.Integer, primary_key=True)
+
+    # Colonne pour la quantité de produit vendue
+    quantite_produit = db.Column(db.Integer, nullable=False)
+
+    # Colonne pour le prix total de la vente
+    prix_total = db.Column(db.Float, nullable=False)
+
+    # Colonne pour l'ID du produit vendu (clé étrangère)
+    id_produit = db.Column(db.Integer, db.ForeignKey(
+        'produit.id_produit'), nullable=False)
+    # Définir la relation avec le modèle Produit
+    produit = relationship('Produit', backref='vente')
+
+    # Colonne pour l'ID du magasin où la vente a eu lieu (clé étrangère)
+    id_magasin = db.Column(db.Integer, db.ForeignKey(
+        'magasin.id_magasin'), nullable=False)
+    # Définir la relation avec le modèle Magasin
+    magasin = relationship('Magasin', backref='vente')
+
+    # Méthode spéciale pour représenter l'objet sous forme de chaîne
+    def __repr__(self):
+        return f'<Vente {self.id_vente}>'
+
+
+# Inspecteur pour la classe Vente
+inspector = inspect(Vente)
+
+# Boucle à travers les colonnes de la table
+for column in inspector.columns.values():
+    print(f"Colonne: {column.name}")
+
+    # Vérifier si la colonne a des clés étrangères
+    if column.foreign_keys:
+        print("C'est une clé étrangère.")
+    else:
+        print("Ce n'est pas une clé étrangère.")
+
+
+# ! Modéle formulaire login et register
+# ? Modèle Login
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[
         DataRequired(), Length(min=4, max=40)])
@@ -81,6 +149,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Connexion')
 
 
+# ? Modèle Register
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[
         DataRequired(), Length(min=4, max=40)])
@@ -89,21 +158,19 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Inscription')
 
 
+# ! Gestion Back-End des Users
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# ? Register user
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if request.method == 'POST' and form.validate_on_submit():
         username = form.username.data
         password = form.password.data
-        # hashed_password = bcrypt.generate_password_hash(password)
-
-        # generate_password_hash(
-        # password, method='pbkdf2:sha256')
 
         # ? Vérifier si le nom d'utilisateur est déjà pris
         existing_user = User.query.filter_by(username=username).first()
@@ -128,7 +195,7 @@ def register():
     return render_template('register.html', form=form)
 
 
-# ? Route `/login`
+# ? Login user
 @app.route("/", methods=["POST", "GET"])
 def login():
     form = LoginForm()
@@ -149,7 +216,7 @@ def login():
     return render_template('zoro.html', form=form)
 
 
-# ? Route `/logout`
+# ? Logout user
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -163,43 +230,40 @@ def logout():
 @app.route("/choix/")
 @login_required
 def choix():
-    return render_template("choix.html")  # redirect(url_for("login"))
+    # redirect(url_for("login"))
+    return render_template("choix.html", title="acceuil")
 
 
+# ! Gestion Back-End des Magasins
+# ? Affichage des produits
 @app.route("/magasin/")
 @login_required
 def magasin():
-    # magasin = Data.query.filter_by(id=_id).first()
-    magasins = Data.query.order_by(Data.id).all()
-    return render_template("magasin.html", magasins=magasins)
+    magasins = Magasin.query.order_by(Magasin.id_magasin).all()
+    return render_template("magasin.html", magasins=magasins, title="Magasin")
 
 
+# ? Ajouter un nouveau magasin
 @app.route("/new_magasin/", methods=['GET', 'POST'])
 @login_required
 def new_magasin():
     if request.method == 'GET':
-        return render_template('new_magasin.html')
+        return render_template('new_magasin.html', title="new_magasin")
 
     if request.method == 'POST':
         name = request.form.get('name')
         adresse = request.form.get('adresse')
         telephone = request.form.get('telephone')
         mail = request.form.get('mail')
-        magasin = Data(name=name, adresse=adresse,
-                       telephone=telephone, mail=mail)
+        magasin = Magasin(name=name, adresse=adresse,
+                          telephone=telephone, mail=mail)
         db.session.add(magasin)
         db.session.commit()
         flash(f"Le {name} a été ajouté avec succès", 'success')
-        # 20f7546f191061ec2c61ee97fa27d5cdb17d55be
         return redirect('/magasin')
 
 
-@app.route("/success/")
-def success():
-    magasins = Data.query.order_by(Data.id).all()
-    return render_template("success.html", magasins=magasins)
-
-
+# ? Modification des infos du magasin
 @app.route("/modifier_mag/<int:_id>", methods=["POST", "GET"])
 @login_required
 def modifier_mag(_id):
@@ -208,7 +272,7 @@ def modifier_mag(_id):
         adresse = request.form["adresse"]
         telephone = request.form["telephone"]
         mail = request.form["mail"]
-        magasin = Data.query.filter_by(id=_id).first()
+        magasin = Magasin.query.filter_by(id_magasin=_id).first()
         magasin.name = name
         magasin.adresse = adresse
         magasin.telephone = telephone
@@ -216,91 +280,147 @@ def modifier_mag(_id):
         db.session.add(magasin)
         db.session.commit()
 
-        flash(f"Votre magasin {_id} a été modifié avec succès.")
+        flash(f"Le magasin n°{_id} a été modifié avec succès.")
         return redirect("/magasin")
 
-    magasin = Data.query.filter_by(id=_id).first()
-    return render_template("modifier_mag.html", magasin=magasin)
+    magasin = Magasin.query.filter_by(id_magasin=_id).first()
+    return render_template("modifier_mag.html", magasin=magasin, title="modifier_mag")
 
 
+# ? Récupération de l'ID du magasin à supprimer
+@app.route("/supp_mag/<int:_id>")
+@login_required
+def supp_mag(_id):
+    magasin = Magasin.query.filter_by(id_magasin=_id).first()
+    return render_template("/supp_mag.html", id_mag=magasin, title="supp_mag")
+
+
+# ? Suppression du magasin
 @app.route("/supp_def/<int:_id>")
+@login_required
 def supp_def(_id):
-    # magasins = Data.query.order_by(Data.id).all()
-    magasin = Data.query.filter_by(id=_id).first()
+    magasin = Magasin.query.filter_by(id_magasin=_id).first()
     db.session.delete(magasin)
     db.session.commit()
 
-    flash(f"Le magasin{_id} a été supprimé avec succès.")
+    flash(f"Le magasin N°{_id} a été supprimé ave succcès.")
     return redirect("/magasin")
 
 
-@app.route("/supp_mag/<int:_id>")
-def supp_mag(_id):
-    magasin = Data.query.filter_by(id=_id).first()
-    # db.session.delete(magasin)
-    # db.session.commit()
-    return render_template("/supp_mag.html", id_mag=magasin)
-
-
-@app.route("/success_supp/")
-def success_sup():
-    magasins = Data.query.order_by(Data.id).all()
-    # mag_id = Data.query.filter_by(id=_id).first()
-    # flash_id = flash("{}".format(mag_id.id))
-    return render_template("success_supp.html", magasins=magasins)
-
-
-@app.route("/success_edit/")
-def success_edit():
-    magasins = Data.query.order_by(Data.id).all()
-    return render_template("success_edit.html", magasins=magasins)
-
-
-@app.route("/MSG_success1/")
-def MSG_success1():
-    return render_template("MSG_success1.html")
-
-
+# ! Gestion Back-End des Produits
+# ? Affichage des produits
 @app.route("/produits/")
+@login_required
 def produits():
-    return render_template("produits.html")
+    produits = Produit.query.order_by(Produit.id_produit).all()
+    return render_template("produits.html", produits=produits, title="Produit")
 
 
-@app.route("/add_prod/")
+# ? Ajouter un nouveau produit
+@app.route("/add_prod/", methods=["POST", "GET"])
+@login_required
 def add_prod():
-    return render_template("add_prod.html")
+    if request.method == 'GET':
+        return render_template('add_prod.html', title="add_produit")
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        categorie = request.form.get('categorie')
+        prix = request.form.get('prix')
+        produit = Produit(name=name, categorie=categorie,
+                          prix=prix)
+        db.session.add(produit)
+        db.session.commit()
+        flash(f"Le {name} a été ajouté avec succès", 'success')
+        return redirect('/produits')
 
 
-@app.route("/edit_prod/")
-def edit_prod():
-    return render_template("edit_prod.html")
+# ? # ? Modification des infos du produit
+@app.route("/edit_prod/<int:_id>", methods=["POST", "GET"])
+@login_required
+def edit_prod(_id):
+    if request.method == 'POST':
+        name = request.form.get('name')
+        categorie = request.form.get('categorie')
+        prix = request.form.get('prix')
+        produit = Produit.query.filter_by(id_produit=_id).first()
+        produit.name = name
+        produit.categorie = categorie
+        produit.prix = prix
+        db.session.add(produit)
+        db.session.commit()
+
+        flash(f"Le produit n°{_id} a été modifié avec succès.")
+        return redirect("/produits")
+
+    produit = Produit.query.filter_by(id_produit=_id).first()
+    return render_template("edit_prod.html", produit=produit, title="edit_prod")
 
 
-@app.route("/supp_prod/")
-def supp_prod():
-    return render_template("supp_prod.html")
+# ? Récupération de l'ID du produit à supprimer
+@app.route("/supp_prod/<int:_id>")
+@login_required
+def supp_prod(_id):
+    produit = Produit.query.filter_by(id_produit=_id).first()
+    return render_template("/supp_prod.html", id_prod=produit, title="supp_prod")
 
 
-@app.route("/prod_msg_success/")
-def prod_msg_success():
-    return render_template("prod_msg_success.html")
+# ? Suppression du produit
+@app.route("/supp_def_prod/<int:_id>")
+@login_required
+def supp_def_prod(_id):
+    produit = Produit.query.filter_by(id_produit=_id).first()
+    db.session.delete(produit)
+    db.session.commit()
 
-
-@app.route("/prod_success/")
-def prod_success():
-    return render_template("prod_success.html")
-
-
-@app.route("/prod_success_edit/")
-def prod_success_edit():
-    return render_template("prod_success_edit.html")
-
-
-@app.route("/prod_success_supp/")
-def prod_success_supp():
-    return render_template("prod_success_supp.html")
+    flash(f"Le Produit N°{_id} a été supprimé ave succcès.")
+    return redirect("/produits")
 
 
 # c'est pour éviter d'avoir à écrire dans le terminal à chaque fois
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=50000, debug=True)
+
+# ------------------------MAGASIN------------------------------------
+# @app.route("/success/")
+# def success():
+#     magasins = Magasin.query.order_by(Magasin.id).all()
+#     return render_template("success.html", magasins=magasins)
+
+
+# @app.route("/success_supp/")
+# def success_sup():
+#     magasins = Magasin.query.order_by(Magasin.id).all()
+#     # mag_id = Magasin.query.filter_by(id=_id).first()
+#     # flash_id = flash("{}".format(mag_id.id))
+#     return render_template("success_supp.html", magasins=magasins)
+
+
+# @app.route("/success_edit/")
+# def success_edit():
+#     magasins = Magasin.query.order_by(Magasin.id).all()
+#     return render_template("success_edit.html", magasins=magasins)
+
+# @app.route("/MSG_success1/")
+# def MSG_success1():
+#     return render_template("MSG_success1.html")
+
+# -----------------------------PRODUIT------------------------------------------------
+# @app.route("/prod_msg_success/")
+# def prod_msg_success():
+#     return render_template("prod_msg_success.html")
+
+
+# @app.route("/prod_success/")
+# def prod_success():
+#     return render_template("prod_success.html")
+
+
+# @app.route("/prod_success_edit/")
+# def prod_success_edit():
+#     return render_template("prod_success_edit.html")
+
+
+# @app.route("/prod_success_supp/")
+# def prod_success_supp():
+#     return render_template("prod_success_supp.html")

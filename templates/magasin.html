@@ -31,15 +31,15 @@
 
             {% for data in magasins %}
             <tr>
-                <td class="impair">{{data.id}}</td>
+                <td class="impair">{{data.id_magasin}}</td>
                 <td class="impair">{{data.name}}</td>
                 <td class="impair">{{data.adresse}}</td>
                 <td class="impair">{{data.telephone}}</td>
                 <td class="impair">{{data.mail}}</td>
                 <td class="impair">
-                    <a href="/modifier_mag/{{data.id}}" class="mod_btn"
+                    <a href="/modifier_mag/{{data.id_magasin}}" class="mod_btn"
                         style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_mag/{{data.id}}" class="supp_btn"
+                    <a href="/supp_mag/{{data.id_magasin}}" class="supp_btn"
                         style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
             </tr>

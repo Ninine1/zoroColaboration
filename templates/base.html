@@ -5,7 +5,12 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="/static/zoro_style.css">
     </link>
-    <title>ZORO MAQUETTE</title>
+    {% if title %}
+    <title>Zoro - {{title}} </title>
+    {% else %}
+    <title>Zoro</title>
+    {% endif %}
+
 </head>
 
 <body>

@@ -9,6 +9,16 @@
 
     <p><strong>Liste des produits <br></strong></p>
 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li id="flash-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <div class="tableau">
         <table>
             <tr>
@@ -18,76 +28,21 @@
                 <th>Prix</th>
                 <th>Action</th>
             </tr>
+
+            {% for produit in produits %}
             <tr>
-                <td class="impair">1</td>
-                <td class="impair">Nom 1</td>
-                <td class="impair">Catégorie 1</td>
-                <td class="impair">Prix 1</td>
+                <td class="impair">{{produit.id_produit}}</td>
+                <td class="impair">{{produit.name}}</td>
+                <td class="impair">{{produit.categorie}}</td>
+                <td class="impair">{{produit.prix}}</td>
                 <td class="impair">
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
+                    <a href="/edit_prod/{{produit.id_produit}}" class="mod_btn"
+                        style="text-decoration: none; border: none;">Modifier</a>
+                    <a href="/supp_prod/{{produit.id_produit}}" class="supp_btn"
+                        style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>Nom 2</td>
-                <td>Catégorie 2</td>
-                <td>Prix 2</td>
-                <td>
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            <tr>
-                <td class="impair">3</td>
-                <td class="impair">Nom 3</td>
-                <td class="impair">Catégorie 3</td>
-                <td class="impair">Prix 3</td>
-                <td class="impair">
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Nom 4</td>
-                <td>Catégorie 4</td>
-                <td>Prix 4</td>
-                <td>
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            <tr>
-                <td class="impair">5</td>
-                <td class="impair">Nom 5</td>
-                <td class="impair">Catégorie 5</td>
-                <td class="impair">Prix 5</td>
-                <td class="impair">
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>Nom 6</td>
-                <td>Catégorie 6</td>
-                <td>Prix 6</td>
-                <td>
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
-            <tr>
-                <td class="impair">7</td>
-                <td class="impair">Nom 7</td>
-                <td class="impair">Catégorie 7</td>
-                <td class="impair">Prix 7</td>
-                <td class="impair">
-                    <a href="/edit_prod/" class="mod_btn" style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
-                </td>
-            </tr>
+            {% endfor %}
 
 
 

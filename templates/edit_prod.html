@@ -1,5 +1,28 @@
-{% extends "add_prod.html" %}
-
+{% extends "base.html" %}
+{% block centre %}
+<div class="right">
   {% block p %}
-    <strong><p>Modifier un produit</p></strong>
+  <strong>
+    <p>Modifier un Produit</p>
+  </strong>
+  {% endblock %}
+
+  <div class="form">
+    <form action="/edit_prod/{{produit.id_produit}}" method="post">
+      <label for="name"> Nom: </label>
+      <input type="text" id="name" name="name" , value="{{produit.name}}">
+
+      <label for="categorie"> Catégorie: </label>
+      <input type="text" id="categorie" name="categorie" , value="{{produit.categorie}}">
+
+      <label for=" prix"> Prix: </label>
+      <input type="int" id="prix" name="prix" , value="{{produit.prix}}">
+
+      <div class=" btn" style="text-decoration: none; border: none;">
+        <button type="submit" class="btn5">Valider</button>
+        <button class="btn4"><a href="/produits/">Retour</a></button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
