@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block centre %}
+
+<div class="droite">
+
+    <a href="/add_prod/" class="btn6" style="text-decoration: none; border: none;">
+        <button>Ajouter</button>
+    </a>
+
+    <p><strong>Liste des produits <br></strong></p>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li id="flash-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <div class="tableau">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Produit</th>
+                    <th>Nom du Produit</th>
+                    <th>Nombre Total des Ventes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for id_produit, name, nombre_ventes in results %}
+                <tr>
+                    <td>{{ id_produit }}</td>
+                    <td>{{ name }}</td>
+                    <td>{{ nombre_ventes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -370,3 +370,39 @@ form div{
 
 
 
+/* ? Form vente */
+.form-vente{
+    /* border: 2px solid red; */
+    width: 80%;
+}
+
+.form-vente form.form_vente{
+    /* background-color: yellow; */
+        grid-template-columns: 15% 30%;
+        grid-template-rows: repeat(4, 40px)
+    /* height: 100%; */
+}
+
+
+form.form_vente span{
+    /* background-color: red; */
+    grid-column: 1 / -1;
+}
+
+form.form_vente .valider{
+    /* background-color: palegreen; */
+    /* grid-column: 1 / -1; */
+    grid-row: 5 / 7;
+    /* width: 100%; */
+    margin: 0;
+    height: 40px;
+    /* height: 40px; */
+}
+
+.valider .btn-valider{
+    width: 60%;
+    height: 100%;
+    border-radius: 4px;
+    background-color: #53B6DA;
+    /* border: none; */
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Vente</title>
+</head>
+
+<body>
+    <h2>Formulaire de Vente</h2>
+
+    <!-- Ajoutez la classe 'vente-form' au formulaire -->
+    <form method="POST" action="/vente" class="vente-form">
+        {{ form.csrf_token }}
+
+        <label for="{{ form.magasin.id }}">Magasin:</label>
+        {{ form.magasin() }}
+        <br>
+
+        <label for="{{ form.produit.id }}">Produit:</label>
+        {{ form.produit(class='produit-select') }}
+        <span class="prix-total-span">Prix Total: $ {{prix_total}} </span>
+        <br>
+
+        <label for="{{ form.quantite.id }}">Quantité:</label>
+        {{ form.quantite(class='quantite-input') }}
+        <br>
+
+        {{ form.submit() }}
+    </form>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

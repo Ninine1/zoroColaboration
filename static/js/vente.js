@@ -1,12 +1,3 @@
-// ? Logique pour faire disparaitre les messages flash après 5s
-setTimeout(function () {
-  var flashMessage = document.getElementById("flash-message");
-  if (flashMessage) {
-    flashMessage.style.display = "none";
-  }
-}, 5000);
-
-// ? Logique pour faire la mise à jour dynamique du prix total
 document.addEventListener("DOMContentLoaded", function () {
   var produitSelect = document.querySelector(".produit-select");
   var quantiteInput = document.querySelector(".quantite-input");

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/zoro_style.css">
+    </link>
+    {% if title %}
+    <title>Zoro - {{title}} </title>
+    {% else %}
+    <title>Zoro</title>
+    {% endif %}
+
+</head>
+
+<body>
+    <section class="second">
+        {% include './base_html/header.html' %}
+
+        <div class="new_grey">
+            {% include './base_html/side_bar.html' %}
+
+            <div class="form-vente">
+
+
+                <form method="POST" action="/vente" class="form form_vente">
+                    {{ form.csrf_token }}
+
+                    <label for="{{ form.magasin.id }}">Magasin:</label>
+                    {{ form.magasin() }}
+
+
+                    <label for="{{ form.produit.id }}">Produit:</label>
+                    {{ form.produit(class='produit-select') }}
+
+
+                    <label for="{{ form.quantite.id }}">Quantité:</label>
+                    {{ form.quantite(class='quantite-input') }}
+
+                    <span class="prix-total-span">Prix Total: $ {{prix_total}} </span> <br>
+
+                    <div class="valider">
+                        {{ form.submit(class="btn-valider") }}
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </section>
+
+    <script src="{{url_for('static', filename='js/script.js')}}"></script>
+
+</body>
+
+</html>

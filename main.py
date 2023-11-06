@@ -9,14 +9,14 @@ from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import pymysql
-from wtforms import PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms import IntegerField, PasswordField, SelectField, StringField, SubmitField
+from wtforms.validators import DataRequired, Length, InputRequired, NumberRange
 from flask_bcrypt import Bcrypt
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import relationship
 
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 app = Flask(__name__)
 
@@ -140,7 +140,7 @@ for column in inspector.columns.values():
 
 
 # ! Modéle formulaire login et register
-# ? Modèle Login
+# ? Modèle Login Form
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[
         DataRequired(), Length(min=4, max=40)])
@@ -149,13 +149,24 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Connexion')
 
 
-# ? Modèle Register
+# ? Modèle Register Form
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[
         DataRequired(), Length(min=4, max=40)])
     password = PasswordField('Password', validators=[
         DataRequired(), Length(min=6, max=50)])
     submit = SubmitField('Inscription')
+
+
+# ? Modèle Vente Form
+class VenteForm(FlaskForm):
+    magasin = SelectField('Magasin', choices=[], coerce=int,
+                          validators=[InputRequired()])
+    produit = SelectField('Produit', choices=[], coerce=int,
+                          validators=[InputRequired()])
+    quantite = IntegerField('Quantité', validators=[
+        InputRequired(), NumberRange(min=1)], default=1)
+    submit = SubmitField('Valider')
 
 
 # ! Gestion Back-End des Users
@@ -375,6 +386,83 @@ def supp_def_prod(_id):
 
     flash(f"Le Produit N°{_id} a été supprimé ave succcès.")
     return redirect("/produits")
+
+
+# ! Exemple de route pour afficher la page de vente
+@app.route('/vente/', methods=['GET', 'POST'])
+@login_required
+def vente():
+    form = VenteForm()
+
+    # Remplir les options des Select avec les noms des magasins et des produits
+    form.magasin.choices = [(magasin.id_magasin, magasin.name)
+                            for magasin in Magasin.query.all()]
+    form.produit.choices = [(produit.id_produit, produit.name)
+                            for produit in Produit.query.all()]
+
+    if form.validate_on_submit():
+        # Logique de traitement côté serveur, par exemple, enregistrement dans la base de données
+        id_magasin = form.magasin.data
+        id_produit = form.produit.data
+        quantite = form.quantite.data
+        prix_unitaire = Produit.query.filter_by(
+            id_produit=id_produit).first().prix
+        prix_total = quantite * prix_unitaire
+
+        nouvelle_vente = Vente(
+            id_magasin=id_magasin,
+            id_produit=id_produit,
+            quantite_produit=quantite,
+            prix_total=prix_total
+        )
+
+        db.session.add(nouvelle_vente)
+        db.session.commit()
+
+        return render_template('vente.html', form=form, prix_total=prix_total)
+
+    return render_template('vente.html', form=form)
+
+
+# !Exemple de route pour récupérer le prix unitaire via une requête AJAX
+@app.route('/get_prix_unitaire/<int:id_produit>', methods=['GET'])
+@login_required
+def get_prix_unitaire(id_produit):
+    produit = Produit.query.filter_by(id_produit=id_produit).first()
+    prix_unitaire = produit.prix if produit else None
+    return jsonify({'prix_unitaire': prix_unitaire})
+
+
+# ! Exemple de route pour obtenir les produits
+@app.route('/produits_vente/', methods=['GET'])
+@login_required
+def produits_vente():
+    # result = db.session.query(
+    #     Produit.id_produit,
+    #     Produit.name,
+    #     (Vente.prix_total).label('montant_total')
+    # ).join(Vente, Produit.id_produit == Vente.id_produit).filter((Vente.prix_total).between(1000, 4000)).order_by(
+    #     (Vente.prix_total).desc()).all()
+    # result = db.session.query(
+    #     Produit.id_produit,
+    #     Produit.name,
+    #     (Vente.prix_total).label('montant_total')
+    # ).join(Vente, Produit.id_produit == Vente.id_produit).group_by(Produit.name).having(
+    #     (Vente.prix_total).between(1000, 4000)
+    # ).order_by((Vente.prix_total).desc()).all()
+    results = (
+        db.session.query(
+            Produit.id_produit,
+            Produit.name,
+            func.count(Vente.id_produit).label('nombre_ventes')
+        )
+        .join(Vente, Produit.id_produit == Vente.id_produit)
+        .group_by(Produit.id_produit, Produit.name)
+        .having(func.count(Vente.id_produit) > 5)
+        .all()
+    )
+
+    return render_template('produits_vente.html', results=results)
 
 
 # c'est pour éviter d'avoir à écrire dans le terminal à chaque fois

@@ -907,8 +907,8 @@
     </collation>
     <schema id="288" parent="1" name="colab_zoro">
       <Current>1</Current>
-      <IntrospectionTimestamp>2023-10-31.20:50:25</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-10-31.18:50:25</LocalIntrospectionTimestamp>
+      <IntrospectionTimestamp>2023-11-06.02:06:11</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-11-06.00:06:11</LocalIntrospectionTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="289" parent="1" name="information_schema">
@@ -947,81 +947,164 @@
     <user id="298" parent="1" name="root">
       <Host>localhost</Host>
     </user>
-    <table id="299" parent="288" name="data">
+    <table id="299" parent="288" name="magasin">
       <Engine>MyISAM</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <table id="300" parent="288" name="user">
+    <table id="300" parent="288" name="produit">
       <Engine>MyISAM</Engine>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </table>
-    <column id="301" parent="299" name="id">
-      <AutoIncrement>54</AutoIncrement>
+    <table id="301" parent="288" name="user">
+      <Engine>MyISAM</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="302" parent="288" name="vente">
+      <Engine>MyISAM</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <column id="303" parent="299" name="id_magasin">
+      <AutoIncrement>3</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="302" parent="299" name="name">
+    <column id="304" parent="299" name="name">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="303" parent="299" name="adresse">
+    <column id="305" parent="299" name="adresse">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="304" parent="299" name="telephone">
+    <column id="306" parent="299" name="telephone">
       <DasType>varchar(20)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="305" parent="299" name="mail">
+    <column id="307" parent="299" name="mail">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <index id="306" parent="299" name="PRIMARY">
-      <ColNames>id</ColNames>
+    <index id="308" parent="299" name="PRIMARY">
+      <ColNames>id_magasin</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="307" parent="299" name="PRIMARY">
+    <key id="309" parent="299" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="308" parent="300" name="id">
-      <AutoIncrement>2</AutoIncrement>
+    <column id="310" parent="300" name="id_produit">
+      <AutoIncrement>6</AutoIncrement>
       <DasType>int|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="309" parent="300" name="username">
-      <DasType>varchar(40)|0s</DasType>
+    <column id="311" parent="300" name="name">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="310" parent="300" name="password">
-      <DasType>varchar(50)|0s</DasType>
+    <column id="312" parent="300" name="categorie">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <index id="311" parent="300" name="PRIMARY">
-      <ColNames>id</ColNames>
+    <column id="313" parent="300" name="prix">
+      <DasType>float|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+    </column>
+    <index id="314" parent="300" name="PRIMARY">
+      <ColNames>id_produit</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="312" parent="300" name="username">
-      <ColNames>username</ColNames>
-      <Type>btree</Type>
-      <Unique>1</Unique>
-    </index>
-    <key id="313" parent="300" name="PRIMARY">
+    <key id="315" parent="300" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="314" parent="300" name="username">
+    <column id="316" parent="301" name="id">
+      <AutoIncrement>13</AutoIncrement>
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="317" parent="301" name="username">
+      <DasType>varchar(40)|0s</DasType>
+      <Position>2</Position>
+    </column>
+    <column id="318" parent="301" name="password_hash">
+      <DasType>varchar(128)|0s</DasType>
+      <Position>3</Position>
+    </column>
+    <index id="319" parent="301" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="320" parent="301" name="username">
+      <ColNames>username</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="321" parent="301" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="322" parent="301" name="username">
       <UnderlyingIndexName>username</UnderlyingIndexName>
+    </key>
+    <column id="323" parent="302" name="id_vente">
+      <AutoIncrement>17</AutoIncrement>
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="324" parent="302" name="quantite_produit">
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="325" parent="302" name="prix_total">
+      <DasType>float|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+    </column>
+    <column id="326" parent="302" name="id_produit">
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+    </column>
+    <column id="327" parent="302" name="id_magasin">
+      <DasType>int|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+    </column>
+    <index id="328" parent="302" name="PRIMARY">
+      <ColNames>id_vente</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="329" parent="302" name="id_produit">
+      <ColNames>id_produit</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="330" parent="302" name="id_magasin">
+      <ColNames>id_magasin</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="331" parent="302" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
   </database-model>
 </dataSource>
