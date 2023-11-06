@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block centre %}
+<div class="right">
+    {% block p %}
+    <strong>
+        <p>Modifier un Magasin</p>
+    </strong>
+    {% endblock %}
+
+    <div action="/modifier_vente/{{vente.id_vente}}" method="post" class="form">
+        <form method="post">
+            <label for="nouvelle_quantite">Nouvelle Quantité:</label>
+            <input type="number" name="nouvelle_quantite" value="{{vente.quantite_produit }}" required>
+
+            <button type="submit">Mettre à jour</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

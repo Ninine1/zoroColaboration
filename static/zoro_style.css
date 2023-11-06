@@ -406,3 +406,10 @@ form.form_vente .valider{
     background-color: #53B6DA;
     /* border: none; */
 }
+
+.tableau-container {
+    max-height: 350px;
+    /* Ajustez la hauteur maximale selon vos besoins */
+    overflow-y: auto;
+    /* Active le défilement vertical si le contenu dépasse la hauteur maximale */
+}

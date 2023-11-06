@@ -3,12 +3,11 @@
 
 <div class="droite">
 
-    <a href="/add_prod/" class="btn6" style="text-decoration: none; border: none;">
+    <a href="/new_magasin/" class="btn6" style="text-decoration: none; border: none;">
         <button>Ajouter</button>
     </a>
 
-    <p><strong>Liste des produits <br></strong></p>
-
+    <p><strong>Liste des produits vendus <br></strong></p>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="flash-messages">
@@ -19,25 +18,40 @@
     {% endif %}
     {% endwith %}
 
-    <div class="tableau">
+    <div class="tableau tableau-container">
         <table>
-            <thead>
-                <tr>
-                    <th>ID Produit</th>
-                    <th>Nom du Produit</th>
-                    <th>Nombre Total des Ventes</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for id_produit, name, nombre_ventes in results %}
-                <tr>
-                    <td>{{ id_produit }}</td>
-                    <td>{{ name }}</td>
-                    <td>{{ nombre_ventes }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+            <tr>
+                <th>Name</th>
+                <th>ID Prodduit</th>
+                <th>Montant total</th>
+                <th>Quantité</th>
+                <th>ID Vente</th>
+
+                <th>Action</th>
+            </tr>
+
+
+            {% for name, id_produit, montant_total, quantite_produit, id_vente in results %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ id_produit }}</td>
+                <td>{{ montant_total }}</td>
+                <td>{{ quantite_produit }}</td>
+                <td>{{ id_vente }}</td>
+
+
+                <td class="impair">
+                    <a href="/modifier_vente/{{id_vente}}" class="mod_btn"
+                        style="text-decoration: none; border: none;">Modifier</a>
+                    <a href="#" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+
+
         </table>
+
 
     </div>
 

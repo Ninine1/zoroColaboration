@@ -433,36 +433,63 @@ def get_prix_unitaire(id_produit):
     return jsonify({'prix_unitaire': prix_unitaire})
 
 
-# ! Exemple de route pour obtenir les produits
+# ! Afficher toutes les ventes
 @app.route('/produits_vente/', methods=['GET'])
 @login_required
 def produits_vente():
-    # result = db.session.query(
-    #     Produit.id_produit,
-    #     Produit.name,
-    #     (Vente.prix_total).label('montant_total')
-    # ).join(Vente, Produit.id_produit == Vente.id_produit).filter((Vente.prix_total).between(1000, 4000)).order_by(
-    #     (Vente.prix_total).desc()).all()
-    # result = db.session.query(
-    #     Produit.id_produit,
-    #     Produit.name,
-    #     (Vente.prix_total).label('montant_total')
-    # ).join(Vente, Produit.id_produit == Vente.id_produit).group_by(Produit.name).having(
-    #     (Vente.prix_total).between(1000, 4000)
-    # ).order_by((Vente.prix_total).desc()).all()
     results = (
         db.session.query(
-            Produit.id_produit,
             Produit.name,
-            func.count(Vente.id_produit).label('nombre_ventes')
+            Vente.id_produit,
+            Vente.prix_total.label('montant_total'),
+            Vente.quantite_produit,
+            Vente.id_vente
         )
-        .join(Vente, Produit.id_produit == Vente.id_produit)
-        .group_by(Produit.id_produit, Produit.name)
-        .having(func.count(Vente.id_produit) > 5)
+        .join(Produit, Produit.id_produit == Vente.id_produit)
         .all()
     )
 
-    return render_template('produits_vente.html', results=results)
+    return render_template('produits_vente.html', results=results, vente=vente)
+
+
+# ! Modifier les ventes
+@app.route('/modifier_vente/<int:_id>', methods=['GET', 'POST'])
+def modifier_vente(_id):
+    vente = Vente.query.filter_by(id_vente=_id).first()
+
+    # magasin = Magasin.query.filter_by(id_magasin=_id).first()
+    # vente = Vente.query.get(id_vente)
+
+    if not vente:
+        flash("La vente spécifiée n'existe pas.", 'danger')
+        # Rediriger vers la liste des ventes
+        return redirect(url_for('produits_vente'))
+
+    if request.method == 'POST':
+        nouvelle_quantite = int(request.form.get('nouvelle_quantite'))
+
+        # Mise à jour de la vente avec la nouvelle quantité
+        vente.quantite_produit = nouvelle_quantite
+
+        # Calcul du nouveau prix total en fonction de la nouvelle quantité et du prix du produit
+        nouveau_prix_total = nouvelle_quantite * vente.produit.prix
+
+        # Mise à jour du prix total dans la vente
+        vente.prix_total = nouveau_prix_total
+
+        # vente.prix_total = nouvelle_quantite * vente.quantite_produit
+        # vente.produit.prix_unitaire
+        print(f"nouvelle quantite est: ${nouvelle_quantite}")
+        print(f"vente quantité est: ${vente.quantite_produit}")
+        print(f"vente prix total est: ${vente.prix_total}")
+
+        db.session.commit()
+
+        flash('Vente mise à jour avec succès.', 'success')
+        # Rediriger vers la liste des ventes
+        return redirect(url_for('produits_vente'))
+
+    return render_template('modifier_vente.html', vente=vente)
 
 
 # c'est pour éviter d'avoir à écrire dans le terminal à chaque fois
