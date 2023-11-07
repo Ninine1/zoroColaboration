@@ -21,11 +21,12 @@
     <div class="tableau tableau-container">
         <table>
             <tr>
-                <th>Name</th>
-                <th>ID Produit</th>
-                <th>Montant total</th>
-                <th>Quantité</th>
                 <th>ID Vente</th>
+                <th>ID Produit</th>
+                <th>Name</th>
+                <th>Quantité</th>
+                <th>Montant total</th>
+
 
                 <th>Action</th>
             </tr>
@@ -33,11 +34,11 @@
 
             {% for name, id_produit, montant_total, quantite_produit, id_vente in results %}
             <tr>
-                <td>{{ name }}</td>
-                <td>{{ id_produit }}</td>
-                <td>{{ montant_total }}</td>
-                <td>{{ quantite_produit }}</td>
                 <td>{{ id_vente }}</td>
+                <td>{{ id_produit }}</td>
+                <td>{{ name }}</td>
+                <td>{{ quantite_produit }}</td>
+                <td>{{ montant_total }}</td>
 
 
                 <td class="impair">

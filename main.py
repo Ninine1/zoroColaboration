@@ -2,7 +2,6 @@ from flask_bcrypt import Bcrypt
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 import pymysql
-# import flask._request_ctx_stack
 
 
 app = Flask(__name__)
@@ -22,7 +21,7 @@ mysql = pymysql.connect(
     db=app.config['MYSQL_DB']
 )
 
-# Utilisez un curseur pour exécuter des requêtes SQL
+# Utilisons un curseur pour exécuter nos requêtes SQL
 cursor = mysql.cursor()
 
 app.config['SECRET_KEY'] = 'secret key'
@@ -36,7 +35,7 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        # Vérifier si l'utilisateur existe déjà
+        # Vérifions si l'utilisateur existe déjà
         select_query = "SELECT id FROM user WHERE username = %s"
         cursor.execute(select_query, (username,))
         existing_user = cursor.fetchone()
@@ -54,12 +53,12 @@ def register():
             cursor.execute(insert_query, (username, hashed_password))
             mysql.commit()
 
-            # Récupérer l'ID de l'utilisateur nouvellement créé
+            # Récupérerons l'ID de l'utilisateur nouvellement inscrit
             cursor.execute(
                 "SELECT id FROM user WHERE username = %s", (username,))
             user_id = cursor.fetchone()[0]
 
-            # Connecter l'utilisateur en stockant son ID dans la session
+            # Connectons l'utilisateur en stockant son ID dans la session
             session['user_id'] = user_id
 
             flash('Inscription réussie! Vous êtes maintenant connecté.', 'success')
@@ -75,20 +74,19 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Requête pour récupérer l'utilisateur depuis la base de données
+        # Récupérons l'utilisateur depuis la base de données
         select_query = "SELECT id, username, password_hash FROM user WHERE username = %s"
         cursor.execute(select_query, (username,))
         user = cursor.fetchone()
 
         if user and bcrypt.check_password_hash(user[2], password):
-            # Mot de passe correct, enregistrez l'utilisateur dans la session
+            # Si mot de passe est correct, alors enregistrons l'utilisateur dans la session
             session['user_id'] = user[0]
             flash('Connexion réussie!', 'success')
             return redirect(url_for('choix'))
         else:
-            flash("Nom d'utilisateur ou mot de passe incorrect.", 'danger')
-            flash(f'Login failed. Check your username: {
-                username} and password: {password}.', 'danger')
+            flash(f"Nom d'utilisateur: {
+                  username} ou mot de passe incorrect: {password}.", 'danger')
 
     return render_template('zoro.html')
 
@@ -97,13 +95,11 @@ def login():
 @app.route('/logout')
 def logout():
 
-    # Déconnectez l'utilisateur en supprimant son ID de session
+    # Déconnectons l'utilisateur en supprimant son ID de session
     session.pop('user_id', None)
-    # Déconnectez l'utilisateur avec Flask-Login
-    # logout_user()
+
     flash('Déconnexion réussie!', 'success')
     return redirect(url_for('login'))
-    # return redirect(request.url)
 
 
 @app.route("/choix/")
@@ -163,7 +159,7 @@ def modifier_mag(_id):
         flash(f"Le magasin n°{_id} a été modifié avec succès.")
         return redirect("/magasin")
 
-    # Requête SQL de sélection pour récupérer les informations du magasin
+    # Récupérerons les informations du magasin
     select_query = "SELECT * FROM magasin WHERE id_magasin=%s"
     cursor.execute(select_query, (_id,))
     magasin = cursor.fetchone()
@@ -174,7 +170,7 @@ def modifier_mag(_id):
 # ? Récupération de l'ID du magasin à supprimer
 @app.route("/supp_mag/<int:_id>")
 def supp_mag(_id):
-    # Requête SQL de sélection pour récupérer les informations du magasin
+    # Récupérer les informations du magasin à supprimer
     select_query = "SELECT * FROM magasin WHERE id_magasin=%s"
     cursor.execute(select_query, (_id,))
     magasin = cursor.fetchone()
@@ -380,9 +376,9 @@ def produits_vente():
 def modifier_vente(_id):
     try:
         if request.method == 'GET':
-            # Exécutez la requête SQL pour récupérer les détails de la vente
+            # Récupérons  les détails de la vente
             select_query = """
-                SELECT v.id_vente, v.quantite_produit, v.prix_total, p.id_produit, p.prix, m.id_magasin
+                SELECT v.id_vente, v.quantite_produit, v.prix_total, p.id_produit, p.prix, m.id_magasin, p.name
                 FROM Vente v
                 JOIN Produit p ON v.id_produit = p.id_produit
                 JOIN Magasin m ON v.id_magasin = m.id_magasin
@@ -391,12 +387,15 @@ def modifier_vente(_id):
             cursor.execute(select_query, (_id,))
             vente_details = cursor.fetchone()
 
+            print(vente_details)
+            print(vente_details[2])
+
             if not vente_details:
                 flash("La vente spécifiée n'existe pas.", 'danger')
                 # Rediriger vers la liste des ventes
                 return redirect(url_for('produits_vente'))
 
-            # Fetch the list of products and stores for the dropdowns
+            # Récupérons la liste des produits et des magasins puis stockons les dans des sélect
             cursor.execute("SELECT id_produit, name FROM Produit")
             produits = cursor.fetchall()
 
