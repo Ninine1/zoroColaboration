@@ -7,8 +7,8 @@
     </strong>
     {% endblock %}
 
-    <div action="/modifier_vente/{{vente_details[0]}}" method="post" class="form">
-        <form method="post">
+    <div class="form">
+        <form action="/modifier_vente/{{vente_details[0]}}" method="post">
             <label for="nouvelle_quantite">Nouvelle Quantité:</label>
             <input type="number" name="nouvelle_quantite" value="{{vente_details[1] }}" required>
 

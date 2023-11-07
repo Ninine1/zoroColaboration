@@ -379,33 +379,44 @@ def produits_vente():
 @app.route('/modifier_vente/<int:_id>', methods=['GET', 'POST'])
 def modifier_vente(_id):
     try:
-        # Exécutez la requête SQL pour récupérer les détails de la vente
-        select_query = """
-            SELECT v.id_vente, v.quantite_produit, v.prix_total, p.id_produit, p.prix, m.id_magasin
-            FROM Vente v
-            JOIN Produit p ON v.id_produit = p.id_produit
-            JOIN Magasin m ON v.id_magasin = m.id_magasin
-            WHERE v.id_vente = %s
-        """
-        cursor.execute(select_query, (_id,))
-        vente_details = cursor.fetchone()
+        if request.method == 'GET':
+            # Exécutez la requête SQL pour récupérer les détails de la vente
+            select_query = """
+                SELECT v.id_vente, v.quantite_produit, v.prix_total, p.id_produit, p.prix, m.id_magasin
+                FROM Vente v
+                JOIN Produit p ON v.id_produit = p.id_produit
+                JOIN Magasin m ON v.id_magasin = m.id_magasin
+                WHERE v.id_vente = %s
+            """
+            cursor.execute(select_query, (_id,))
+            vente_details = cursor.fetchone()
 
-        if not vente_details:
-            flash("La vente spécifiée n'existe pas.", 'danger')
-            # Rediriger vers la liste des ventes
-            return redirect(url_for('produits_vente'))
+            if not vente_details:
+                flash("La vente spécifiée n'existe pas.", 'danger')
+                # Rediriger vers la liste des ventes
+                return redirect(url_for('produits_vente'))
+
+            # Fetch the list of products and stores for the dropdowns
+            cursor.execute("SELECT id_produit, name FROM Produit")
+            produits = cursor.fetchall()
+
+            cursor.execute("SELECT id_magasin, name FROM Magasin")
+            magasins = cursor.fetchall()
+
+            return render_template('modifier_vente.html', vente_details=vente_details, produits=produits, magasins=magasins)
 
         if request.method == 'POST':
             nouvelle_quantite = int(request.form.get('nouvelle_quantite'))
             nouveau_produit = int(request.form.get('produit'))
             nouveau_magasin = int(request.form.get('magasin'))
 
-            # Calcul du nouveau prix total en fonction de la nouvelle quantité et du prix du nouveau produit
-            nouveau_prix_total = nouvelle_quantite * vente_details[4]
+            # Fetch the price of the selected product
+            cursor.execute(
+                "SELECT prix FROM Produit WHERE id_produit = %s", (nouveau_produit,))
+            prix_produit = cursor.fetchone()[0]
 
-            print(nouvelle_quantite)
-            print(vente_details[4])
-            print(nouveau_prix_total)
+            # Calcul du nouveau prix total en fonction de la nouvelle quantité et du prix du nouveau produit
+            nouveau_prix_total = nouvelle_quantite * prix_produit
 
             # Mise à jour de la vente avec la nouvelle quantité, le nouveau produit et le nouveau magasin
             update_query = """
@@ -421,14 +432,6 @@ def modifier_vente(_id):
             # Rediriger vers la liste des ventes
             return redirect(url_for('produits_vente'))
 
-        # Fetch the list of products and stores for the dropdowns
-        cursor.execute("SELECT id_produit, name FROM Produit")
-        produits = cursor.fetchall()
-
-        cursor.execute("SELECT id_magasin, name FROM Magasin")
-        magasins = cursor.fetchall()
-
-        return render_template('modifier_vente.html', vente_details=vente_details, produits=produits, magasins=magasins)
     except Exception as e:
         # Gérez les erreurs, par exemple, affichez un message d'erreur
         flash(f"Erreur lors de la modification de la vente: {str(e)}", 'error')
