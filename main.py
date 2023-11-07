@@ -1,262 +1,132 @@
-from collections.abc import Mapping, Sequence
-import hashlib
-from typing import Any
-# from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from flask import Flask, jsonify, render_template, request, redirect, session, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from werkzeug.security import generate_password_hash, check_password_hash
-
-import pymysql
-from wtforms import IntegerField, PasswordField, SelectField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length, InputRequired, NumberRange
 from flask_bcrypt import Bcrypt
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+import pymysql
+# import flask._request_ctx_stack
 
-from sqlalchemy import ForeignKey, func
-from sqlalchemy.orm import relationship
-
-from sqlalchemy import inspect, text
 
 app = Flask(__name__)
-
-# DATABASE_URL = 'mysql://root:''@localhost/colab_zoro'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:''@localhost/colab_zoro'
-app.config['SECRET_KEY'] = 'secret key'
-
-db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
-# bcrypt = Bcrypt(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:''@localhost/colab_zoro'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'colab_zoro'
 
-with app.app_context():
-    db.create_all()
+mysql = pymysql.connect(
+    host=app.config['MYSQL_HOST'],
+    user=app.config['MYSQL_USER'],
+    password=app.config['MYSQL_PASSWORD'],
+    db=app.config['MYSQL_DB']
+)
 
+# Utilisez un curseur pour exécuter des requêtes SQL
+cursor = mysql.cursor()
 
-# ? Création du modèle SQLAlchemy pour les utilisateurs
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(40), unique=True)
-    password_hash = db.Column(db.String(128))
-
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(
-            password)  # generate_password_hash(password)
-
-    def verify_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
-
-    # * Create a String
-    def __repr__(self):
-        return '<Name %r>' % self.username
-
-
-# def reset_passwords():
-#     users = User.query.all()
-#     for user in users:
-#         user.set_password(user.password)
-#     db.session.commit()
-
-
-# reset_passwords()
-
-
-# ? Création du modèle SQLAlchemy pour les Magasins
-
-
-class Magasin(db.Model):
-    id_magasin = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    adresse = db.Column(db.String(50), nullable=False)
-    telephone = db.Column(db.String(20), nullable=False)
-    mail = db.Column(db.String(50), nullable=False)
-
-    def __repr__(self):
-        return '<Name %r>' % self.id
-
-
-# ? Création du modèle SQLAlchemy pour les Produits
-class Produit(db.Model):
-    # Colonne d'identifiant unique
-    id_produit = db.Column(db.Integer, primary_key=True)
-
-    # Colonne pour le nom du produit
-    name = db.Column(db.String(100), nullable=False)
-
-    # Colonne pour la catégorie du produit
-    categorie = db.Column(db.String(100), nullable=False)
-
-    # Colonne pour le prix du produit
-    prix = db.Column(db.Float, nullable=False)
-
-    # Méthode spéciale pour représenter l'objet sous forme de chaîne
-    def __repr__(self):
-        return f'<Produit {self.name}>'
-
-
-# ? Création du modèle SQLAlchemy pour les Ventes
-class Vente(db.Model):
-    # Colonne d'identifiant unique
-    id_vente = db.Column(db.Integer, primary_key=True)
-
-    # Colonne pour la quantité de produit vendue
-    quantite_produit = db.Column(db.Integer, nullable=False)
-
-    # Colonne pour le prix total de la vente
-    prix_total = db.Column(db.Float, nullable=False)
-
-    # Colonne pour l'ID du produit vendu (clé étrangère)
-    id_produit = db.Column(db.Integer, db.ForeignKey(
-        'produit.id_produit'), nullable=False)
-    # Définir la relation avec le modèle Produit
-    produit = relationship('Produit', backref='vente')
-
-    # Colonne pour l'ID du magasin où la vente a eu lieu (clé étrangère)
-    id_magasin = db.Column(db.Integer, db.ForeignKey(
-        'magasin.id_magasin'), nullable=False)
-    # Définir la relation avec le modèle Magasin
-    magasin = relationship('Magasin', backref='vente')
-
-    # Méthode spéciale pour représenter l'objet sous forme de chaîne
-    def __repr__(self):
-        return f'<Vente {self.id_vente}>'
-
-
-# Inspecteur pour la classe Vente
-inspector = inspect(Vente)
-
-# Boucle à travers les colonnes de la table
-for column in inspector.columns.values():
-    print(f"Colonne: {column.name}")
-
-    # Vérifier si la colonne a des clés étrangères
-    if column.foreign_keys:
-        print("C'est une clé étrangère.")
-    else:
-        print("Ce n'est pas une clé étrangère.")
-
-
-# ! Modéle formulaire login et register
-# ? Modèle Login Form
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(), Length(min=4, max=40)])
-    password = PasswordField('Password', validators=[
-        DataRequired(), Length(min=6, max=50)])
-    submit = SubmitField('Connexion')
-
-
-# ? Modèle Register Form
-class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(), Length(min=4, max=40)])
-    password = PasswordField('Password', validators=[
-        DataRequired(), Length(min=6, max=50)])
-    submit = SubmitField('Inscription')
-
-
-# ? Modèle Vente Form
-class VenteForm(FlaskForm):
-    magasin = SelectField('Magasin', choices=[], coerce=int,
-                          validators=[InputRequired()])
-    produit = SelectField('Produit', choices=[], coerce=int,
-                          validators=[InputRequired()])
-    quantite = IntegerField('Quantité', validators=[
-        InputRequired(), NumberRange(min=1)], default=1)
-    submit = SubmitField('Valider')
+app.config['SECRET_KEY'] = 'secret key'
 
 
 # ! Gestion Back-End des Users
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
 # ? Register user
-@app.route("/register", methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-        # ? Vérifier si le nom d'utilisateur est déjà pris
-        existing_user = User.query.filter_by(username=username).first()
+        # Vérifier si l'utilisateur existe déjà
+        select_query = "SELECT id FROM user WHERE username = %s"
+        cursor.execute(select_query, (username,))
+        existing_user = cursor.fetchone()
+
         if existing_user:
-            flash('Username already exit. Please choose another.', 'danger')
-            return redirect(url_for('register'))
+            flash(
+                "Cet utilisateur existe déjà. Veuillez choisir un autre nom d'utilisateur.", 'danger')
+        else:
+            # Hash du mot de passe
+            hashed_password = bcrypt.generate_password_hash(
+                password)
 
-        # ? Créer un nouvel utilisateur
-        new_user = User(username=username)
-        new_user.set_password(password)
-        db.session.add(new_user)
+            # Insertion de l'utilisateur dans la base de données
+            insert_query = "INSERT INTO user (username, password_hash) VALUES (%s, %s)"
+            cursor.execute(insert_query, (username, hashed_password))
+            mysql.commit()
 
-        try:
-            db.session.commit()
-            login_user(new_user)
-            flash('Registration successful. You are now log in.', 'success')
+            # Récupérer l'ID de l'utilisateur nouvellement créé
+            cursor.execute(
+                "SELECT id FROM user WHERE username = %s", (username,))
+            user_id = cursor.fetchone()[0]
+
+            # Connecter l'utilisateur en stockant son ID dans la session
+            session['user_id'] = user_id
+
+            flash('Inscription réussie! Vous êtes maintenant connecté.', 'success')
             return redirect(url_for('choix'))
-        except Exception as e:
-            flash('An error occurred during registration. Please try again.', 'danger')
-            return redirect(url_for('register'))
 
-    return render_template('register.html', form=form)
+    return render_template('register.html')
 
 
 # ? Login user
-@app.route("/", methods=["POST", "GET"])
+@app.route('/', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-        user = User.query.filter_by(username=username).first()
-        print(f"User found: {user}")
-        if user and user.verify_password(password):
-            login_user(user)
-            flash('You are now log in.', 'success')
+        # Requête pour récupérer l'utilisateur depuis la base de données
+        select_query = "SELECT id, username, password_hash FROM user WHERE username = %s"
+        cursor.execute(select_query, (username,))
+        user = cursor.fetchone()
+
+        if user and bcrypt.check_password_hash(user[2], password):
+            # Mot de passe correct, enregistrez l'utilisateur dans la session
+            session['user_id'] = user[0]
+            flash('Connexion réussie!', 'success')
             return redirect(url_for('choix'))
         else:
+            flash("Nom d'utilisateur ou mot de passe incorrect.", 'danger')
             flash(f'Login failed. Check your username: {
                 username} and password: {password}.', 'danger')
 
-    return render_template('zoro.html', form=form)
+    return render_template('zoro.html')
 
 
-# ? Logout user
-@app.route('/logout', methods=['GET', 'POST'])
-@login_required
+# Route pour la déconnexion
+@app.route('/logout')
 def logout():
-    if request.method == 'POST':
-        logout_user()
-        flash('You have been logged out.', 'info')
-        return redirect(url_for('login'))
-    return redirect(request.url)
+
+    # Déconnectez l'utilisateur en supprimant son ID de session
+    session.pop('user_id', None)
+    # Déconnectez l'utilisateur avec Flask-Login
+    # logout_user()
+    flash('Déconnexion réussie!', 'success')
+    return redirect(url_for('login'))
+    # return redirect(request.url)
 
 
 @app.route("/choix/")
-@login_required
 def choix():
-    # redirect(url_for("login"))
     return render_template("choix.html", title="acceuil")
 
 
-# ! Gestion Back-End des Magasins
-# ? Affichage des produits
+# ! Gestion Back-end des Magasins
+# ? Affichage des magasins
 @app.route("/magasin/")
-@login_required
 def magasin():
-    magasins = Magasin.query.order_by(Magasin.id_magasin).all()
-    return render_template("magasin.html", magasins=magasins, title="Magasin")
+    cursor.execute("SELECT * FROM Magasin ORDER BY id_magasin")
+    data = cursor.fetchall()
+
+    magasins = []
+    for item in data:
+        magasins.append(item)
+
+    return render_template("magasin.html", magasins=magasins)
 
 
 # ? Ajouter un nouveau magasin
 @app.route("/new_magasin/", methods=['GET', 'POST'])
-@login_required
 def new_magasin():
     if request.method == 'GET':
         return render_template('new_magasin.html', title="new_magasin")
@@ -266,276 +136,322 @@ def new_magasin():
         adresse = request.form.get('adresse')
         telephone = request.form.get('telephone')
         mail = request.form.get('mail')
-        magasin = Magasin(name=name, adresse=adresse,
-                          telephone=telephone, mail=mail)
-        db.session.add(magasin)
-        db.session.commit()
+
+        insert_query = "INSERT INTO magasin (name, adresse, telephone, mail) VALUES (%s, %s, %s, %s)"
+        cursor.execute(insert_query, (name, adresse, telephone, mail))
+        mysql.commit()
+
         flash(f"Le {name} a été ajouté avec succès", 'success')
+
         return redirect('/magasin')
 
 
 # ? Modification des infos du magasin
 @app.route("/modifier_mag/<int:_id>", methods=["POST", "GET"])
-@login_required
 def modifier_mag(_id):
     if request.method == 'POST':
         name = request.form["name"]
         adresse = request.form["adresse"]
         telephone = request.form["telephone"]
         mail = request.form["mail"]
-        magasin = Magasin.query.filter_by(id_magasin=_id).first()
-        magasin.name = name
-        magasin.adresse = adresse
-        magasin.telephone = telephone
-        magasin.mail = mail
-        db.session.add(magasin)
-        db.session.commit()
+
+        # Requête SQL de mise à jour
+        update_query = "UPDATE magasin SET name=%s, adresse=%s, telephone=%s, mail=%s WHERE id_magasin=%s"
+        cursor.execute(update_query, (name, adresse, telephone, mail, _id))
+        mysql.commit()
 
         flash(f"Le magasin n°{_id} a été modifié avec succès.")
         return redirect("/magasin")
 
-    magasin = Magasin.query.filter_by(id_magasin=_id).first()
+    # Requête SQL de sélection pour récupérer les informations du magasin
+    select_query = "SELECT * FROM magasin WHERE id_magasin=%s"
+    cursor.execute(select_query, (_id,))
+    magasin = cursor.fetchone()
+
     return render_template("modifier_mag.html", magasin=magasin, title="modifier_mag")
 
 
 # ? Récupération de l'ID du magasin à supprimer
 @app.route("/supp_mag/<int:_id>")
-@login_required
 def supp_mag(_id):
-    magasin = Magasin.query.filter_by(id_magasin=_id).first()
-    return render_template("/supp_mag.html", id_mag=magasin, title="supp_mag")
+    # Requête SQL de sélection pour récupérer les informations du magasin
+    select_query = "SELECT * FROM magasin WHERE id_magasin=%s"
+    cursor.execute(select_query, (_id,))
+    magasin = cursor.fetchone()
+
+    return render_template("/supp_mag.html", magasin=magasin, title="supp_mag")
 
 
 # ? Suppression du magasin
-@app.route("/supp_def/<int:_id>")
-@login_required
+@app.route("/supp_def_mag/<int:_id>")
 def supp_def(_id):
-    magasin = Magasin.query.filter_by(id_magasin=_id).first()
-    db.session.delete(magasin)
-    db.session.commit()
+    try:
+        # Requête SQL de suppression
+        delete_query = "DELETE FROM magasin WHERE id_magasin=%s"
+        cursor.execute(delete_query, (_id,))
 
-    flash(f"Le magasin N°{_id} a été supprimé ave succcès.")
-    return redirect("/magasin")
+        # Validation des changements dans la base de données
+        mysql.commit()
+
+        flash(f"Le magasin N°{_id} a été supprimé avec succès.")
+        return redirect("/magasin")
+    except Exception as e:
+        # En cas d'erreur, annuler les changements et afficher un message d'erreur
+        mysql.rollback()
+        flash(f"Erreur lors de la suppression du magasin: {str(e)}", 'error')
 
 
-# ! Gestion Back-End des Produits
+# ! Gestion Back-end des Produits
 # ? Affichage des produits
 @app.route("/produits/")
-@login_required
 def produits():
-    produits = Produit.query.order_by(Produit.id_produit).all()
+    cursor.execute("SELECT * FROM Produit ORDER BY id_produit")
+    data = cursor.fetchall()
+
+    produits = []
+    for item in data:
+        produits.append(item)
+
     return render_template("produits.html", produits=produits, title="Produit")
 
 
 # ? Ajouter un nouveau produit
 @app.route("/add_prod/", methods=["POST", "GET"])
-@login_required
 def add_prod():
-    if request.method == 'GET':
-        return render_template('add_prod.html', title="add_produit")
+    try:
+        if request.method == 'GET':
+            return render_template('add_prod.html', title="add_produit")
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        categorie = request.form.get('categorie')
-        prix = request.form.get('prix')
-        produit = Produit(name=name, categorie=categorie,
-                          prix=prix)
-        db.session.add(produit)
-        db.session.commit()
-        flash(f"Le {name} a été ajouté avec succès", 'success')
+        if request.method == 'POST':
+            name = request.form.get('name')
+            categorie = request.form.get('categorie')
+            prix = request.form.get('prix')
+
+            # Exécutez la requête SQL pour ajouter un nouveau produit
+            insert_query = """
+                INSERT INTO Produit (name, categorie, prix)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(insert_query, (name, categorie, prix))
+            mysql.commit()
+
+            flash(f"Le {name} a été ajouté avec succès", 'success')
+            return redirect('/produits')
+
+    except Exception as e:
+        # Gérez les erreurs, par exemple, affichez un message d'erreur
+        flash(f"Erreur lors de l'ajout du produit: {str(e)}", 'error')
         return redirect('/produits')
 
 
-# ? # ? Modification des infos du produit
+# ? Modifier un nouveau produit
 @app.route("/edit_prod/<int:_id>", methods=["POST", "GET"])
-@login_required
 def edit_prod(_id):
     if request.method == 'POST':
         name = request.form.get('name')
         categorie = request.form.get('categorie')
         prix = request.form.get('prix')
-        produit = Produit.query.filter_by(id_produit=_id).first()
-        produit.name = name
-        produit.categorie = categorie
-        produit.prix = prix
-        db.session.add(produit)
-        db.session.commit()
+
+        # Requête SQL de mise à jour
+        update_query = "UPDATE Produit SET name=%s, categorie=%s, prix=%s WHERE id_produit=%s"
+        cursor.execute(update_query, (name, categorie, prix, _id))
+        mysql.commit()
 
         flash(f"Le produit n°{_id} a été modifié avec succès.")
         return redirect("/produits")
 
-    produit = Produit.query.filter_by(id_produit=_id).first()
+    # Requête SQL de sélection pour récupérer les informations du magasin
+    select_query = "SELECT * FROM Produit WHERE id_produit=%s"
+    cursor.execute(select_query, (_id,))
+    produit = cursor.fetchone()
+
     return render_template("edit_prod.html", produit=produit, title="edit_prod")
 
 
 # ? Récupération de l'ID du produit à supprimer
 @app.route("/supp_prod/<int:_id>")
-@login_required
 def supp_prod(_id):
-    produit = Produit.query.filter_by(id_produit=_id).first()
-    return render_template("/supp_prod.html", id_prod=produit, title="supp_prod")
+    # Requête SQL de sélection pour récupérer les informations du magasin
+    select_query = "SELECT * FROM Produit WHERE id_produit=%s"
+    cursor.execute(select_query, (_id,))
+    produit = cursor.fetchone()
+
+    return render_template("/supp_prod.html", produit=produit, title="supp_mag")
 
 
 # ? Suppression du produit
 @app.route("/supp_def_prod/<int:_id>")
-@login_required
 def supp_def_prod(_id):
-    produit = Produit.query.filter_by(id_produit=_id).first()
-    db.session.delete(produit)
-    db.session.commit()
+    try:
+        # Requête SQL de suppression
+        delete_query = "DELETE FROM Produit WHERE id_produit=%s"
+        cursor.execute(delete_query, (_id,))
 
-    flash(f"Le Produit N°{_id} a été supprimé ave succcès.")
-    return redirect("/produits")
+        # Validation des changements dans la base de données
+        mysql.commit()
+
+        flash(f"Le Produit N°{_id} a été supprimé avec succès.")
+        return redirect("/produits")
+    except Exception as e:
+        # En cas d'erreur, annuler les changements et afficher un message d'erreur
+        mysql.rollback()
+        flash(f"Erreur lors de la suppression du magasin: {str(e)}", 'error')
 
 
-# ! Exemple de route pour afficher la page de vente
+# ! Gestion Back-end des Ventes
+# ? Afficher la page d'enregistrement des ventes
 @app.route('/vente/', methods=['GET', 'POST'])
-@login_required
 def vente():
-    form = VenteForm()
+    if request.method == 'POST':
+        id_magasin = request.form.get('magasin')
+        id_produit = request.form.get('produit')
+        quantite = int(request.form.get('quantite'))
 
-    # Remplir les options des Select avec les noms des magasins et des produits
-    form.magasin.choices = [(magasin.id_magasin, magasin.name)
-                            for magasin in Magasin.query.all()]
-    form.produit.choices = [(produit.id_produit, produit.name)
-                            for produit in Produit.query.all()]
+        # Récupération du prix unitaire depuis la table Produit
+        select_produit_query = "SELECT prix FROM Produit WHERE id_produit=%s"
+        cursor.execute(select_produit_query, (id_produit,))
+        prix_unitaire = cursor.fetchone()[0]
+        print(prix_unitaire)
 
-    if form.validate_on_submit():
-        # Logique de traitement côté serveur, par exemple, enregistrement dans la base de données
-        id_magasin = form.magasin.data
-        id_produit = form.produit.data
-        quantite = form.quantite.data
-        prix_unitaire = Produit.query.filter_by(
-            id_produit=id_produit).first().prix
         prix_total = quantite * prix_unitaire
 
-        nouvelle_vente = Vente(
-            id_magasin=id_magasin,
-            id_produit=id_produit,
-            quantite_produit=quantite,
-            prix_total=prix_total
-        )
+        try:
+            # Insertion de la vente dans la table Vente avec les ID du produit et du magasin
+            insert_vente_query = "INSERT INTO Vente (id_magasin, id_produit, quantite_produit, prix_total) VALUES (%s, %s, %s, %s)"
+            cursor.execute(insert_vente_query, (id_magasin,
+                           id_produit, quantite, prix_total))
+            mysql.commit()
 
-        db.session.add(nouvelle_vente)
-        db.session.commit()
+            flash(f"La vente a été enregistrée avec succès. Prix total: {
+                  prix_total}", 'success')
+            return redirect('/produits_vente')
+        except Exception as e:
+            # En cas d'erreur, annuler les changements et afficher un message d'erreur
+            mysql.rollback()
+            flash(f"Erreur lors de l'enregistrement de la vente: {
+                  str(e)}", 'error')
 
-        return render_template('vente.html', form=form, prix_total=prix_total)
+    # Remplir les options des Select avec les noms des magasins et des produits
+    select_magasin_query = "SELECT id_magasin, name FROM Magasin"
+    cursor.execute(select_magasin_query)
+    magasins = cursor.fetchall()
 
-    return render_template('vente.html', form=form)
+    select_produit_query = "SELECT id_produit, name FROM Produit"
+    cursor.execute(select_produit_query)
+    produits = cursor.fetchall()
+
+    return render_template('vente.html', magasins=magasins, produits=produits)
 
 
-# !Exemple de route pour récupérer le prix unitaire via une requête AJAX
+# ? Route pour récupérer le prix unitaire d'un produit
 @app.route('/get_prix_unitaire/<int:id_produit>', methods=['GET'])
-@login_required
 def get_prix_unitaire(id_produit):
-    produit = Produit.query.filter_by(id_produit=id_produit).first()
-    prix_unitaire = produit.prix if produit else None
+    select_produit_query = "SELECT prix FROM Produit WHERE id_produit=%s"
+    cursor.execute(select_produit_query, (id_produit,))
+    prix_unitaire = cursor.fetchone()[0] if cursor.rowcount > 0 else None
     return jsonify({'prix_unitaire': prix_unitaire})
 
 
-# ! Afficher toutes les ventes
+# ? Afficher toutes les ventes
 @app.route('/produits_vente/', methods=['GET'])
-@login_required
 def produits_vente():
-    results = (
-        db.session.query(
-            Produit.name,
-            Vente.id_produit,
-            Vente.prix_total.label('montant_total'),
-            Vente.quantite_produit,
-            Vente.id_vente
-        )
-        .join(Produit, Produit.id_produit == Vente.id_produit)
-        .all()
-    )
+    try:
+        # Exécutez la requête SQL pour récupérer les données
+        select_query = """
+            SELECT p.name, v.id_produit, v.prix_total AS montant_total,
+                   v.quantite_produit, v.id_vente
+            FROM Vente v
+            JOIN Produit p ON v.id_produit = p.id_produit
+            ORDER BY v.id_vente
+        """
+        cursor.execute(select_query)
+        results = cursor.fetchall()
+        # print(results)
 
-    return render_template('produits_vente.html', results=results, vente=vente)
+        return render_template('produits_vente.html', results=results)
+    except Exception as e:
+        # Gérez les erreurs, par exemple, affichez un message d'erreur
+        flash(f"Erreur lors de la récupération des données: {str(e)}", 'error')
+        return redirect('/')
 
 
-# ! Modifier les ventes
+# ? Modifier les ventes
 @app.route('/modifier_vente/<int:_id>', methods=['GET', 'POST'])
 def modifier_vente(_id):
-    vente = Vente.query.filter_by(id_vente=_id).first()
+    try:
+        # Exécutez la requête SQL pour récupérer les détails de la vente
+        select_query = """
+            SELECT v.id_vente, v.quantite_produit, v.prix_total, p.id_produit, p.prix, m.id_magasin
+            FROM Vente v
+            JOIN Produit p ON v.id_produit = p.id_produit
+            JOIN Magasin m ON v.id_magasin = m.id_magasin
+            WHERE v.id_vente = %s
+        """
+        cursor.execute(select_query, (_id,))
+        vente_details = cursor.fetchone()
 
-    # magasin = Magasin.query.filter_by(id_magasin=_id).first()
-    # vente = Vente.query.get(id_vente)
+        if not vente_details:
+            flash("La vente spécifiée n'existe pas.", 'danger')
+            # Rediriger vers la liste des ventes
+            return redirect(url_for('produits_vente'))
 
-    if not vente:
-        flash("La vente spécifiée n'existe pas.", 'danger')
-        # Rediriger vers la liste des ventes
+        if request.method == 'POST':
+            nouvelle_quantite = int(request.form.get('nouvelle_quantite'))
+            nouveau_produit = int(request.form.get('produit'))
+            nouveau_magasin = int(request.form.get('magasin'))
+
+            # Calcul du nouveau prix total en fonction de la nouvelle quantité et du prix du nouveau produit
+            nouveau_prix_total = nouvelle_quantite * vente_details[4]
+
+            print(nouvelle_quantite)
+            print(vente_details[4])
+            print(nouveau_prix_total)
+
+            # Mise à jour de la vente avec la nouvelle quantité, le nouveau produit et le nouveau magasin
+            update_query = """
+                UPDATE Vente
+                SET quantite_produit = %s, prix_total = %s, id_produit = %s, id_magasin = %s
+                WHERE id_vente = %s
+            """
+            cursor.execute(
+                update_query, (nouvelle_quantite, nouveau_prix_total, nouveau_produit, nouveau_magasin, _id))
+            mysql.commit()
+
+            flash(f'La vente N°{_id} a été mise à jour.', 'success')
+            # Rediriger vers la liste des ventes
+            return redirect(url_for('produits_vente'))
+
+        # Fetch the list of products and stores for the dropdowns
+        cursor.execute("SELECT id_produit, name FROM Produit")
+        produits = cursor.fetchall()
+
+        cursor.execute("SELECT id_magasin, name FROM Magasin")
+        magasins = cursor.fetchall()
+
+        return render_template('modifier_vente.html', vente_details=vente_details, produits=produits, magasins=magasins)
+    except Exception as e:
+        # Gérez les erreurs, par exemple, affichez un message d'erreur
+        flash(f"Erreur lors de la modification de la vente: {str(e)}", 'error')
         return redirect(url_for('produits_vente'))
 
-    if request.method == 'POST':
-        nouvelle_quantite = int(request.form.get('nouvelle_quantite'))
 
-        # Mise à jour de la vente avec la nouvelle quantité
-        vente.quantite_produit = nouvelle_quantite
+# ? Supprimer les ventes
+@app.route("/supprimer_vente/<int:_id>")
+def supprimer_vente(_id):
+    try:
+        # Exécutez la requête SQL pour supprimer la vente
+        delete_query = "DELETE FROM Vente WHERE id_vente = %s"
+        cursor.execute(delete_query, (_id,))
+        mysql.commit()
 
-        # Calcul du nouveau prix total en fonction de la nouvelle quantité et du prix du produit
-        nouveau_prix_total = nouvelle_quantite * vente.produit.prix
-
-        # Mise à jour du prix total dans la vente
-        vente.prix_total = nouveau_prix_total
-
-        # vente.prix_total = nouvelle_quantite * vente.quantite_produit
-        # vente.produit.prix_unitaire
-        print(f"nouvelle quantite est: ${nouvelle_quantite}")
-        print(f"vente quantité est: ${vente.quantite_produit}")
-        print(f"vente prix total est: ${vente.prix_total}")
-
-        db.session.commit()
-
-        flash('Vente mise à jour avec succès.', 'success')
-        # Rediriger vers la liste des ventes
-        return redirect(url_for('produits_vente'))
-
-    return render_template('modifier_vente.html', vente=vente)
+        flash(f"La Vente N°{_id} a été supprimée avec succès.")
+        return redirect("/produits_vente")
+    except Exception as e:
+        # Gérez les erreurs, par exemple, affichez un message d'erreur
+        flash(f"Erreur lors de la suppression de la vente: {str(e)}", 'error')
+        return redirect("/produits_vente")
 
 
-# c'est pour éviter d'avoir à écrire dans le terminal à chaque fois
+# c'est pour éviter d'avoir à écrire le port dans terminal à chaque fois
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=50000, debug=True)
-
-# ------------------------MAGASIN------------------------------------
-# @app.route("/success/")
-# def success():
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#     return render_template("success.html", magasins=magasins)
-
-
-# @app.route("/success_supp/")
-# def success_sup():
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#     # mag_id = Magasin.query.filter_by(id=_id).first()
-#     # flash_id = flash("{}".format(mag_id.id))
-#     return render_template("success_supp.html", magasins=magasins)
-
-
-# @app.route("/success_edit/")
-# def success_edit():
-#     magasins = Magasin.query.order_by(Magasin.id).all()
-#     return render_template("success_edit.html", magasins=magasins)
-
-# @app.route("/MSG_success1/")
-# def MSG_success1():
-#     return render_template("MSG_success1.html")
-
-# -----------------------------PRODUIT------------------------------------------------
-# @app.route("/prod_msg_success/")
-# def prod_msg_success():
-#     return render_template("prod_msg_success.html")
-
-
-# @app.route("/prod_success/")
-# def prod_success():
-#     return render_template("prod_success.html")
-
-
-# @app.route("/prod_success_edit/")
-# def prod_success_edit():
-#     return render_template("prod_success_edit.html")
-
-
-# @app.route("/prod_success_supp/")
-# def prod_success_supp():
-#     return render_template("prod_success_supp.html")
+    app.run(debug=True, port=50000)

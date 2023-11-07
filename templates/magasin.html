@@ -18,7 +18,7 @@
     {% endif %}
     {% endwith %}
 
-    <div class="tableau">
+    <div class="tableau tableau-container">
         <table>
             <tr>
                 <th>id</th>
@@ -29,17 +29,17 @@
                 <th>Action</th>
             </tr>
 
-            {% for data in magasins %}
+            {% for magasin in magasins %}
             <tr>
-                <td class="impair">{{data.id_magasin}}</td>
-                <td class="impair">{{data.name}}</td>
-                <td class="impair">{{data.adresse}}</td>
-                <td class="impair">{{data.telephone}}</td>
-                <td class="impair">{{data.mail}}</td>
+                <td class="impair">{{magasin[0]}}</td>
+                <td class="impair">{{magasin[1]}}</td>
+                <td class="impair">{{magasin[2]}}</td>
+                <td class="impair">{{magasin[3]}}</td>
+                <td class="impair">{{magasin[4]}}</td>
                 <td class="impair">
-                    <a href="/modifier_mag/{{data.id_magasin}}" class="mod_btn"
+                    <a href="/modifier_mag/{{magasin[0]}}" class="mod_btn"
                         style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_mag/{{data.id_magasin}}" class="supp_btn"
+                    <a href="/supp_mag/{{magasin[0]}}" class="supp_btn"
                         style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
             </tr>

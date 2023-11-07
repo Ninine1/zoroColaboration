@@ -8,18 +8,18 @@
   {% endblock %}
 
   <div class="form">
-    <form action="/modifier_mag/{{magasin.id_magasin}}" method="post">
+    <form action="/modifier_mag/{{magasin[0]}}" method="post">
       <label for="name"> Nom: </label>
-      <input type="text" id="name" name="name" , value="{{magasin.name}}">
+      <input type="text" id="name" name="name" , value="{{magasin[1]}}" required>
 
       <label for="adresse"> Adresse: </label>
-      <input type="text" id="adresse" name="adresse" , value="{{magasin.adresse}}">
+      <input type="text" id="adresse" name="adresse" , value="{{magasin[2]}}" required>
 
       <label for=" tel"> Téléphone: </label>
-      <input type="text" id="tel" name="telephone" , value="{{magasin.telephone}}">
+      <input type="text" id="tel" name="telephone" , value="{{magasin[3]}}" required>
 
       <label for=" mail"> E-mail: </label>
-      <input type="email" id="mail" name="mail" , value="{{magasin.mail}}">
+      <input type="email" id="mail" name="mail" , value="{{magasin[4]}}" required>
 
       <div class=" btn" style="text-decoration: none; border: none;">
         <button type="submit" class="btn5">Valider</button>

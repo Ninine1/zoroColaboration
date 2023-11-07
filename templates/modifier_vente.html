@@ -3,16 +3,31 @@
 <div class="right">
     {% block p %}
     <strong>
-        <p>Modifier un Magasin</p>
+        <p>Modifier une Vente</p>
     </strong>
     {% endblock %}
 
-    <div action="/modifier_vente/{{vente.id_vente}}" method="post" class="form">
+    <div action="/modifier_vente/{{vente_details[0]}}" method="post" class="form">
         <form method="post">
             <label for="nouvelle_quantite">Nouvelle Quantité:</label>
-            <input type="number" name="nouvelle_quantite" value="{{vente.quantite_produit }}" required>
+            <input type="number" name="nouvelle_quantite" value="{{vente_details[1] }}" required>
+
+            <label for="magasin"> Magasin: </label>
+            <select id="magasin" name="magasin">
+                {% for magasin_id, magasin_name in magasins %}
+                <option value="{{ magasin_id }}">{{ magasin_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="produit"> Produit: </label>
+            <select id="produit" name="produit">
+                {% for produit_id, produit_name in produits %}
+                <option value="{{ produit_id }}">{{ produit_name }}</option>
+                {% endfor %}
+            </select>
 
             <button type="submit">Mettre à jour</button>
+            <button class="btn4"><a href="/produits_vente/">Retour</a></button>
         </form>
     </div>
 </div>

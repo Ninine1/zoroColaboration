@@ -19,7 +19,7 @@
     {% endif %}
     {% endwith %}
 
-    <div class="tableau">
+    <div class="tableau tableau-container">
         <table>
             <tr>
                 <th>id</th>
@@ -31,14 +31,14 @@
 
             {% for produit in produits %}
             <tr>
-                <td class="impair">{{produit.id_produit}}</td>
-                <td class="impair">{{produit.name}}</td>
-                <td class="impair">{{produit.categorie}}</td>
-                <td class="impair">{{produit.prix}}</td>
+                <td class="impair">{{produit[0]}}</td>
+                <td class="impair">{{produit[1]}}</td>
+                <td class="impair">{{produit[2]}}</td>
+                <td class="impair">{{produit[3]}}</td>
                 <td class="impair">
-                    <a href="/edit_prod/{{produit.id_produit}}" class="mod_btn"
+                    <a href="/edit_prod/{{produit[0]}}" class="mod_btn"
                         style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="/supp_prod/{{produit.id_produit}}" class="supp_btn"
+                    <a href="/supp_prod/{{produit[0]}}" class="supp_btn"
                         style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
             </tr>

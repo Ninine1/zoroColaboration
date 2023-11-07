@@ -28,19 +28,13 @@
             <form action="{{url_for('login')}}" class="sign_in" method="POST">
 
                 Connectez-vous
-                {{ form.hidden_tag() }}:
-
-                {{ form.username(size=20, class="btn1", placeholder="Identifiant") }}
-
-                {{ form.password(size=20,class="btn2", placeholder="Mot de passe") }}
 
 
-
-                <!-- <input class="btn1" placeholder="Identifiant" name="username"> -->
-                <!-- <input class="btn2" placeholder="Mot de passe" name="password"> -->
+                <input class="btn1" placeholder="Identifiant" name="username">
+                <input class="btn2" placeholder="Mot de passe" name="password">
                 <div class="btna">
-                    {{ form.submit(class="btn3", style="text-decoration: none; border: none;") }}
-                    <!-- /<button type="submit" class="btn3" style="text-decoration: none; border: none;">Login</button> -->
+
+                    <button type="submit" class="btn3" style="text-decoration: none; border: none;">Login</button>
                     <!-- <a href="/choix/" class="btn3" style="text-decoration: none; border: none;">Connexion</a> -->
                 </div>
                 <a href="{{url_for('register')}}">si pas de compte inscrivez-vous</a>

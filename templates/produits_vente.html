@@ -3,7 +3,7 @@
 
 <div class="droite">
 
-    <a href="/new_magasin/" class="btn6" style="text-decoration: none; border: none;">
+    <a href="/vente/" class="btn6" style="text-decoration: none; border: none;">
         <button>Ajouter</button>
     </a>
 
@@ -22,7 +22,7 @@
         <table>
             <tr>
                 <th>Name</th>
-                <th>ID Prodduit</th>
+                <th>ID Produit</th>
                 <th>Montant total</th>
                 <th>Quantité</th>
                 <th>ID Vente</th>
@@ -43,7 +43,8 @@
                 <td class="impair">
                     <a href="/modifier_vente/{{id_vente}}" class="mod_btn"
                         style="text-decoration: none; border: none;">Modifier</a>
-                    <a href="#" class="supp_btn" style="text-decoration: none; border: none;">Suprimer</a>
+                    <a href="/supprimer_vente/{{id_vente}}" class="supp_btn"
+                        style="text-decoration: none; border: none;">Suprimer</a>
                 </td>
             </tr>
             {% endfor %}
